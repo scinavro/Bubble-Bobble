@@ -5,16 +5,14 @@
 class Player
 {
 public:
-	enum FACE { LEFT, RIGHT };
-	enum HORIZONTAL_STATE { STOP, MOVE };
-	enum VERTICAL_STATE {STOP_2, JUMP, FALL};
+	enum class FACE { LEFT, RIGHT };
+	enum class HORIZONTAL_STATE { STOP, MOVE };
+	enum class VERTICAL_STATE {STOP, JUMP, FALL};
 
 	Player(float x, float y, float z, float size);
 
 	void setCenter(const Vector3f& c);
 	Vector3f getCenter() const;
-	void setCurrentCenter(Vector3f& c);
-	Vector3f getCurrentCenter();
 
 	void setVelocity(const Vector3f& v);
 	Vector3f getVelocity() const;
@@ -27,16 +25,16 @@ public:
 	void setVerticalState(VERTICAL_STATE vState);
 	Bubble shootBubble();
 
-	void jump();
+	void horizontalmove();
+	void verticalmove();
 
-	bool isMoving() const;
+	HORIZONTAL_STATE getHorizontalState();
+	VERTICAL_STATE getVerticalState();
 
-	bool isDragonInAir() const;
-
-	void move();
 	void draw() const;
 
 private:
+	int firstvelocitycount;
 	bool isdragoninair;
 	Vector3f center;
 	Vector3f velocity;

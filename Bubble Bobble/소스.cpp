@@ -4,8 +4,10 @@
 #include "Constants.h"
 #include "Light.h"
 
-#include "Dragon.h"
+#include "Player.h"
 #include "Platform.h"
+
+#include "Stage.h"
 
 #include <GL/freeglut.h>
 
@@ -27,11 +29,15 @@ void idle() {
 	if ((float)(end_t - start_t) > 1000 / 30.0f) {
 
 		start_t = end_t;
-		if (player.isMoving()) {
-			player.move();
-		}
+		player.horizontalmove();
+		player.verticalmove();
 		for (auto &bub : bubbles) {
+			if (bub.getRadius() == 30) {
+				Vector3f v(0.0f, 3.0f, 0.0f);
+				bub.setVelocity(v);
+			}
 			bub.move();
+			bub.setRadius(bub.getRadius() + 2.0f);
 		}
 
 	}
@@ -84,10 +90,10 @@ void keyboardDown(unsigned char key, int x, int y) {
 	if (key == ' ') {
 		bubbles.push_back(player.shootBubble());
 	}
-	else if (key == GLUT_KEY_UP) {
+	if (key == GLUT_KEY_UP) {
 		player.setVerticalState(Player::VERTICAL_STATE::JUMP);
-		player.jump();
 	}
+
 }
 
 void specialKeyDown(int key, int x, int y) {
@@ -107,7 +113,7 @@ void specialKeyDown(int key, int x, int y) {
 			break;
 	}
 }
-`
+
 void specialKeyUp(int key, int x, int y) {
 	/* Implement */
 

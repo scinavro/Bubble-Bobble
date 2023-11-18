@@ -40,9 +40,10 @@ bool platformCollision(const vector<Platform>& platforms, Vector3f& center) {
 	bool platformCollided = false;
 
 	for (auto platform : platforms) {
-		if (platform.getTopEdge() > center[1] - PLAYER_SIZE / 2.0) {
+		if (platform.getTopEdge() > center[1] - PLAYER_SIZE / 2.0 && platform.getBottomEdge() < center[1] + PLAYER_SIZE / 2.0 &&
+			platform.getLeftEdge() < center[0] + PLAYER_SIZE / 2.0 && platform.getRightEdge() > center[0] - PLAYER_SIZE / 2.0) {
 			platformCollided = true;
-			center[1] = platform.getTopEdge() + PLAYER_SIZE / 2.0;
+			center[1] = platform.getTopEdge() + PLAYER_SIZE;
 		}
 	}
 
@@ -63,6 +64,9 @@ void collisionHandler(const Stage& stage, Player& player) {
 		if (platformCollision(platforms, center)) {
 			player.setVerticalState(Player::VERTICAL_STATE::STOP);
 		}
+		else {
+			//player.setVerticalState(Player::VERTICAL_STATE::FALL);
+		}
 	}
 }
 
@@ -73,8 +77,6 @@ void idle() {
 	if ((float)(end_t - start_t) > 1000 / 30.0f) {
 
 		start_t = end_t;
-		
-		collisionHandler(stages[0], player);
 
 		player.horizontalmove();
 		player.verticalmove();
@@ -88,6 +90,8 @@ void idle() {
 				bub.setRadius(bub.getRadius() + 2.0f);
 			}
 		}
+
+		collisionHandler(stages[0], player);
 
 	}
 

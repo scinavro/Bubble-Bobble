@@ -23,27 +23,39 @@ Platform ground(0.0f, -boundaryY + PLAYER_SIZE * 0.5f, 0.0f, boundaryX * 2, PLAY
 vector<Bubble> bubbles;
 vector<Stage> stages;
 
-bool wallCollision(const vector<Wall>& walls, Vector3f& center) {
+bool wallCollision(const vector<Wall>& walls, Player& player) {
 	bool wallCollided = false;
+	Vector3f center = player.getCenter();
 
 	for (auto wall : walls) {
 		if (wall.getTopEdge() >= center[1] - PLAYER_SIZE/2.0 && wall.getBottomEdge() <= center[1] + PLAYER_SIZE / 2.0 &&
 			wall.getLeftEdge() <= center[0] + PLAYER_SIZE / 2.0 && wall.getRightEdge() >= center[0] - PLAYER_SIZE / 2.0) {
 			wallCollided = true;
+			Vector3f newCenter = player.getCenter();
+			if (player.getVelocity()[0] > 0) {
+				newCenter[0] = wall.getLeftEdge() - PLAYER_SIZE / 2.0;
+			}
+			else if (player.getVelocity()[0] < 0) {
+				newCenter[0] = wall.getRightEdge() + PLAYER_SIZE / 2.0;
+			}
+			player.setCenter(newCenter);
 		}
 	}
 
 	return wallCollided;
 }
 
-bool platformCollision(const vector<Platform>& platforms, Vector3f& center) {
+bool platformCollision(const vector<Platform>& platforms, Player& player) {
 	bool platformCollided = false;
+	Vector3f center = player.getCenter();
 
-	for (auto platform : platforms) {
+	for (auto& platform : platforms) {
 		if (platform.getTopEdge() >= center[1] - PLAYER_SIZE / 2.0 && platform.getBottomEdge() <= center[1] + PLAYER_SIZE / 2.0 &&
 			platform.getLeftEdge() <= center[0] + PLAYER_SIZE / 2.0 && platform.getRightEdge() >= center[0] - PLAYER_SIZE / 2.0) {
 			platformCollided = true;
-			center[1] = platform.getTopEdge() + PLAYER_SIZE * 2.0;
+			Vector3f newCenter = player.getCenter();
+			newCenter[1] = platform.getTopEdge() + PLAYER_SIZE / 2.0;
+			player.setCenter(newCenter);
 		}
 	}
 
@@ -55,19 +67,16 @@ void collisionHandler(const Stage& stage, Player& player) {
 	vector<Platform> platforms = stage.getPlatforms();
 	vector<Wall> walls = stage.getWalls();
 	vector<Monster> monsters = stage.getMonsters();
-	Vector3f center = player.getCenter();
 
-	if (wallCollision(walls, center)) {
+	if (wallCollision(walls, player)) {
 		player.setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 	}
 	if (player.getVelocity()[1] <= 0) {
 		// platform과 닿아있는 상태 (STOP)
-		if (platformCollision(platforms, center)) {
+		if (platformCollision(platforms, player)) {
 			player.setVerticalState(Player::VERTICAL_STATE::STOP);
-			Vector3f newVelocity = player.getVelocity();
-			newVelocity[1] = 0;
-			player.setVelocity(newVelocity);
 		}
+		// platform에 닿아있다가 떨어지는 상태 (FALL)
 		else {
 			if (player.getAcceleration()[1] == 0) {
 				player.setVerticalState(Player::VERTICAL_STATE::FALL);
@@ -81,7 +90,6 @@ void idle() {
 	end_t = clock();
 
 	if ((float)(end_t - start_t) > 1000 / 30.0f) {
-
 		start_t = end_t;
 
 		player.horizontalmove();

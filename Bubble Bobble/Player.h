@@ -14,8 +14,11 @@ public:
 	void setCenter(const Vector3f& c);
 	Vector3f getCenter() const;
 
-	void setVelocity(const Vector3f& v);
-	Vector3f getVelocity() const;
+	void setHorizontalVelocity(const Vector3f& v);
+	Vector3f getHorizontalVelocity() const;
+
+	void setVerticalVelocity(const Vector3f& v);
+	Vector3f getVerticalVelocity() const;
 
 	void setAcceleration(const Vector3f& a);
 	Vector3f getAcceleration()const;
@@ -37,7 +40,8 @@ private:
 	int firstvelocitycount;
 	bool isdragoninair;
 	Vector3f center;
-	Vector3f velocity;
+	Vector3f horizontalvelocity;
+	Vector3f verticalvelocity;
 	Vector3f acceleration;
 	Vector3f current_center;
 	float size;

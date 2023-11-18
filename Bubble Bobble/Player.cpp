@@ -11,11 +11,17 @@ void Player::setCenter(const Vector3f& c) {
 Vector3f Player::getCenter() const {
 	return center;
 }
-void Player::setVelocity(const Vector3f& v) {
-	velocity = v;
+void Player::setHorizontalVelocity(const Vector3f& v) {
+	horizontalvelocity = v;
 }
-Vector3f Player::getVelocity() const {
-	return velocity;
+Vector3f Player::getHorizontalVelocity() const {
+	return horizontalvelocity;
+}
+void Player::setVerticalVelocity(const Vector3f& v) {
+	verticalvelocity = v;
+}
+Vector3f Player::getVerticalVelocity() const {
+	return verticalvelocity;
 }
 void Player::setAcceleration(const Vector3f& a) {
 	acceleration = a;
@@ -54,7 +60,7 @@ void Player::setVerticalState(VERTICAL_STATE vState) {
 Bubble Player::shootBubble() {
 	Bubble bub(2, 20, 20);
 	Vector3f bubblevelocity;
-	bubblevelocity.setPos(7.0f, 0.0f, 0.0f);
+	bubblevelocity.setPos(15.0f, 0.0f, 0.0f);
 	bub.setCenter(center);
 	if (face == FACE::LEFT) {
 		bub.setVelocity(-1 * bubblevelocity);
@@ -100,32 +106,36 @@ Player::VERTICAL_STATE Player::getVerticalState() {
 
 void Player::horizontalmove() {
 
+	Vector3f horizontalvelocity;
+
 	if (horizontalState == HORIZONTAL_STATE::MOVE) {
 		if (face == FACE::RIGHT) {
-			velocity[0] = 5.0f;
+			//velocity[0] = 5.0f;
+			horizontalvelocity.setPos(5.0f, 0.0f, 0.0f);
 		}
 		else if (face == FACE::LEFT) {
-			velocity[0] = -5.0f;
+			//velocity[0] = -5.0f;
+			horizontalvelocity.setPos(-5.0f, 0.0f, 0.0f);
 		}
-		center = center + velocity;
+		center = center + horizontalvelocity;
 	}
 	else{
-		velocity[0] = 0.0f;
+		horizontalvelocity[0] = 0.0f;
 	}
 	
 }
 void Player::verticalmove() {
 	if (verticalState == VERTICAL_STATE::JUMP) {
 		acceleration[1] = -2.0f;
-		velocity = velocity + acceleration;
-		center = center + velocity;
+		verticalvelocity = verticalvelocity + acceleration;
+		center = center + verticalvelocity;
 	}
 	else if (verticalState == VERTICAL_STATE::FALL) {
-		velocity[1] = -20.0f;
-		center = center + velocity;
+		verticalvelocity[1] = -20.0f;
+		center = center + verticalvelocity;
 	}
 	else {
-		velocity[1] = 0.0f;
+		verticalvelocity[1] = 0.0f;
 		acceleration[1] = 0.0f;
 	}
 }

@@ -8,6 +8,7 @@
 #include "Platform.h"
 
 #include "Stage.h"
+#include"Wall.h"
 
 #include <GL/freeglut.h>
 
@@ -32,12 +33,18 @@ bool wallCollision(const vector<Wall>& walls, Player& player) {
 			wall.getLeftEdge() <= center[0] + PLAYER_SIZE / 2.0 && wall.getRightEdge() >= center[0] - PLAYER_SIZE / 2.0) {
 			wallCollided = true;
 			Vector3f newCenter = player.getCenter();
-			if (player.getVelocity()[0] > 0) {
+			if (player.getHorizontalVelocity()[0] > 0) {
 				newCenter[0] = wall.getLeftEdge() - PLAYER_SIZE / 2.0;
 			}
-			else if (player.getVelocity()[0] < 0) {
+			else if (player.getHorizontalVelocity()[0] < 0) {
 				newCenter[0] = wall.getRightEdge() + PLAYER_SIZE / 2.0;
 			}
+			/*else if (player.getVerticalVelocity()[1] > 0) {
+				newCenter[1] = wall.getBottomEdge() - PLAYER_SIZE / 2.0;
+			}
+			else if (player.getVerticalVelocity()[1] <= 0) {
+				newCenter[1] = wall.getTopEdge() + PLAYER_SIZE / 2.0;
+			}*/
 			player.setCenter(newCenter);
 		}
 	}
@@ -71,7 +78,7 @@ void collisionHandler(const Stage& stage, Player& player) {
 	if (wallCollision(walls, player)) {
 		player.setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 	}
-	if (player.getVelocity()[1] <= 0) {
+	if (player.getVerticalVelocity()[1] <= 0) {
 		// platform과 닿아있는 상태 (STOP)
 		if (platformCollision(platforms, player)) {
 			player.setVerticalState(Player::VERTICAL_STATE::STOP);
@@ -178,9 +185,9 @@ void specialKeyDown(int key, int x, int y) {
 
 		case GLUT_KEY_UP:
 			if (player.getVerticalState() == Player::VERTICAL_STATE::STOP) {
-				Vector3f newVelocity = player.getVelocity();
+				Vector3f newVelocity = player.getVerticalVelocity();
 				newVelocity[1] = 30.0f;
-				player.setVelocity(newVelocity);
+				player.setVerticalVelocity(newVelocity);
 				player.setVerticalState(Player::VERTICAL_STATE::JUMP);
 			}
 			break;
@@ -216,11 +223,20 @@ void initialize() {
 	
 	vector<Platform> platforms1;
 	platforms1.push_back(ground);
-	platforms1.push_back(Platform(0, 0, 0, boundaryX, PLAYER_SIZE));
+	platforms1.push_back(Platform(0, -10, 0, boundaryX, 50));
+	platforms1.push_back(Platform(0, -180, 0, boundaryX, 50));
+	platforms1.push_back(Platform(0, 160, 0, boundaryX, 50));
+	platforms1.push_back(Platform(325, 160, 0, 50, 50));
+	platforms1.push_back(Platform(-325, 160, 0, 50, 50));
+	platforms1.push_back(Platform(325, -10, 0, 50, 50));
+	platforms1.push_back(Platform(-325, -10, 0, 50, 50));
+	platforms1.push_back(Platform(325, -180, 0, 50, 50));
+	platforms1.push_back(Platform(-325,-180, 0, 50, 50));
 	stage1.setPlatforms(platforms1);
 
 	vector<Wall> walls1;
 	walls1.push_back(Wall(boundaryX - PLAYER_SIZE / 2.0, 0, 0, PLAYER_SIZE, WINDOW_HEIGHT));
+	walls1.push_back(Wall(-boundaryX + PLAYER_SIZE / 2.0, 0,0, PLAYER_SIZE, WINDOW_HEIGHT));
 	stage1.setWalls(walls1);
 
 	stages.push_back(stage1);

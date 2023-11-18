@@ -13,7 +13,7 @@ public:
 
 	void move();
 	void setFace(FACE f);
-	void draw();
+	void draw() const;
 private:
 	Vector3f center;
 	Vector3f velocity;

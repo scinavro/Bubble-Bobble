@@ -35,7 +35,7 @@ void Monster::move() {
 	}
 }
 
-void Monster::draw() {
+void Monster::draw() const {
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glBegin(GL_POLYGON);
 	glVertex3f(center[0] + size / 2, center[1] + size / 2, center[2]);

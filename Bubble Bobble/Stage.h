@@ -4,19 +4,26 @@
 #include"Wall.h"
 #include<vector>
 
+using namespace std;
 
 class Stage {
 public:
-	Stage();
-	void setPlatforms();
-	void setWalls();
-	void setMonsters();
+	Stage(int ID);
+	void setPlatforms(const vector<Platform>& platforms);
+	void setWalls(const vector<Wall>& walls);
+	void setMonsters(const vector<Monster>& monsters);
+
+	vector<Platform> getPlatforms() const;
+	vector<Wall> getWalls() const;
+	vector<Monster> getMonsters() const;
 
 	void setstageFinished();
 	bool getstageFinished();
 
-	void draw();
+	void draw() const;
+
 private:
+	int stageID;
 	vector<Platform> Platforms;
 	vector<Wall> Walls;
 	vector<Monster>Monsters;

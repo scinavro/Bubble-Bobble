@@ -7,7 +7,7 @@ class Player
 public:
 	enum class FACE { LEFT, RIGHT };
 	enum class HORIZONTAL_STATE { STOP, MOVE };
-	enum class VERTICAL_STATE {STOP, JUMP, FALL};
+	enum class VERTICAL_STATE { STOP, JUMP, FALL };
 
 	Player(float x, float y, float z, float size);
 

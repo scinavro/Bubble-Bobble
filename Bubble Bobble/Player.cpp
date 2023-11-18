@@ -101,13 +101,13 @@ Player::VERTICAL_STATE Player::getVerticalState() {
 void Player::horizontalmove() {
 
 	if (horizontalState == HORIZONTAL_STATE::MOVE) {
-		velocity[0] = 1.5f;
 		if (face == FACE::RIGHT) {
-			center = center + velocity;
+			velocity[0] = 3.0f;
 		}
 		else if (face == FACE::LEFT) {
-			center = center - velocity;
+			velocity[0] = -3.0f;
 		}
+		center = center + velocity;
 	}
 	else{
 		velocity[0] = 0.0f;
@@ -116,11 +116,6 @@ void Player::horizontalmove() {
 }
 void Player::verticalmove() {
 	if (verticalState == VERTICAL_STATE::JUMP) {
-		if (firstvelocitycount == 0) {
-			float firstvelocity = 30.0f;
-			velocity[1] = firstvelocity;
-			firstvelocitycount += 1;
-		}
 		acceleration[1] = -2.0f;
 		velocity = velocity + acceleration;
 		center = center + velocity;
@@ -130,7 +125,6 @@ void Player::verticalmove() {
 		center = center + velocity;
 	}
 	else {
-		firstvelocitycount = 0;
 		velocity[1] = 0.0f;
 		acceleration[1] = 0.0f;
 	}

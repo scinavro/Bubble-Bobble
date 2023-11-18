@@ -27,8 +27,8 @@ bool wallCollision(const vector<Wall>& walls, Vector3f& center) {
 	bool wallCollided = false;
 
 	for (auto wall : walls) {
-		if (wall.getTopEdge() > center[1] - PLAYER_SIZE/2.0 && wall.getBottomEdge() < center[1] + PLAYER_SIZE / 2.0 &&
-			wall.getLeftEdge() < center[0] + PLAYER_SIZE / 2.0 && wall.getRightEdge() > center[0] - PLAYER_SIZE / 2.0) {
+		if (wall.getTopEdge() >= center[1] - PLAYER_SIZE/2.0 && wall.getBottomEdge() <= center[1] + PLAYER_SIZE / 2.0 &&
+			wall.getLeftEdge() <= center[0] + PLAYER_SIZE / 2.0 && wall.getRightEdge() >= center[0] - PLAYER_SIZE / 2.0) {
 			wallCollided = true;
 		}
 	}
@@ -40,10 +40,10 @@ bool platformCollision(const vector<Platform>& platforms, Vector3f& center) {
 	bool platformCollided = false;
 
 	for (auto platform : platforms) {
-		if (platform.getTopEdge() > center[1] - PLAYER_SIZE / 2.0 && platform.getBottomEdge() < center[1] + PLAYER_SIZE / 2.0 &&
-			platform.getLeftEdge() < center[0] + PLAYER_SIZE / 2.0 && platform.getRightEdge() > center[0] - PLAYER_SIZE / 2.0) {
+		if (platform.getTopEdge() >= center[1] - PLAYER_SIZE / 2.0 && platform.getBottomEdge() <= center[1] + PLAYER_SIZE / 2.0 &&
+			platform.getLeftEdge() <= center[0] + PLAYER_SIZE / 2.0 && platform.getRightEdge() >= center[0] - PLAYER_SIZE / 2.0) {
 			platformCollided = true;
-			center[1] = platform.getTopEdge() + PLAYER_SIZE;
+			center[1] = platform.getTopEdge() + PLAYER_SIZE * 2.0;
 		}
 	}
 
@@ -61,11 +61,17 @@ void collisionHandler(const Stage& stage, Player& player) {
 		player.setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 	}
 	if (player.getVelocity()[1] <= 0) {
+		// platform과 닿아있는 상태 (STOP)
 		if (platformCollision(platforms, center)) {
 			player.setVerticalState(Player::VERTICAL_STATE::STOP);
+			Vector3f newVelocity = player.getVelocity();
+			newVelocity[1] = 0;
+			player.setVelocity(newVelocity);
 		}
 		else {
-			//player.setVerticalState(Player::VERTICAL_STATE::FALL);
+			if (player.getAcceleration()[1] == 0) {
+				player.setVerticalState(Player::VERTICAL_STATE::FALL);
+			}
 		}
 	}
 }
@@ -90,9 +96,8 @@ void idle() {
 				bub.setRadius(bub.getRadius() + 2.0f);
 			}
 		}
-
+		
 		collisionHandler(stages[0], player);
-
 	}
 
 	glutPostRedisplay();
@@ -111,7 +116,6 @@ void display() {
 	glLoadIdentity();
 
 	// Draw 2D
-	//ground.draw();
 	player.draw();
 
 	// Draw 3D

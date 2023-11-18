@@ -102,10 +102,10 @@ void Player::horizontalmove() {
 
 	if (horizontalState == HORIZONTAL_STATE::MOVE) {
 		if (face == FACE::RIGHT) {
-			velocity[0] = 3.0f;
+			velocity[0] = 5.0f;
 		}
 		else if (face == FACE::LEFT) {
-			velocity[0] = -3.0f;
+			velocity[0] = -5.0f;
 		}
 		center = center + velocity;
 	}
@@ -121,7 +121,7 @@ void Player::verticalmove() {
 		center = center + velocity;
 	}
 	else if (verticalState == VERTICAL_STATE::FALL) {
-		velocity[1] = -0.8f;
+		velocity[1] = -20.0f;
 		center = center + velocity;
 	}
 	else {

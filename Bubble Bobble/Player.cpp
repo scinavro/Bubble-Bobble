@@ -2,9 +2,12 @@
 #include<GL/freeglut.h>
 
 Player::Player(float x, float y, float z, float size){
-	center[0] = x; center[1] = y; center[2] = z; this->size = size; face = FACE::LEFT; 
+	center[0] = x; center[1] = y; center[2] = z; this->size = size; face = FACE::LEFT; playerlife = true;
 }
 
+float Player::getSize() {
+	return size;
+}
 void Player::setCenter(const Vector3f& c) {
 	center = c;
 }

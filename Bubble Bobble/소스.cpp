@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include<cmath>
 
 #include "Constants.h"
 #include "Light.h"
@@ -20,7 +21,6 @@ clock_t start_t = clock();
 clock_t end_t;
 
 Player player(0.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
-Platform ground(0.0f, -boundaryY + PLAYER_SIZE * 0.5f, 0.0f, boundaryX * 2, PLAYER_SIZE);
 vector<Bubble> bubbles;
 vector<Stage> stages;
 
@@ -90,6 +90,32 @@ void collisionHandler(const Stage& stage, Player& player) {
 			}
 		}
 	}
+	if (player.getCenter()[1] - player.getSize()/2.0 <= -boundaryY) {
+		player.setCenter(Vector3f(player.getCenter()[0], player.getCenter()[1] + boundaryY * 2, 0));
+	}
+}
+
+bool MonsterBubbleCollision(vector<Vector3f>vertexes, Bubble bubble) {
+	bool bubblemonstercollided = false;
+	for (auto& vertex : vertexes) {
+		float distance = sqrt(pow(bubble.getCenter()[0] - vertex[0], 2) + pow(bubble.getCenter()[1] - vertex[1], 2));
+		if (distance <= bubble.getRadius()) {
+			bubblemonstercollided = true;
+			break;
+		}
+	}
+	return bubblemonstercollided;
+}
+
+void MonsterDeathHanler(vector<Monster>& monsters, vector<Bubble> bubbles) {
+	for (auto& monster : monsters) {
+		for (auto& bubble : bubbles) {
+			if (MonsterBubbleCollision(monster.getvertex(), bubble)) {
+				monster.setMonsterlifedead();
+				break;
+			}
+		}
+	}
 }
 
 void idle() {
@@ -111,8 +137,18 @@ void idle() {
 				bub.setRadius(bub.getRadius() + 2.0f);
 			}
 		}
-		
+		for (auto& stage : stages) {
+			for (auto& monster : stage.getMonsters()) {
+				monster.move();
+			}
+		}
+		//MonsterDeathHanler(stages[0].getMonsters(), bubbles);  이 부분에서 에러남
+
 		collisionHandler(stages[0], player);
+
+		
+
+
 	}
 
 	glutPostRedisplay();
@@ -222,10 +258,16 @@ void initialize() {
 	Stage stage1(0);
 	
 	vector<Platform> platforms1;
-	platforms1.push_back(ground);
-	platforms1.push_back(Platform(0, -10, 0, boundaryX, 50));
-	platforms1.push_back(Platform(0, -180, 0, boundaryX, 50));
-	platforms1.push_back(Platform(0, 160, 0, boundaryX, 50));
+	Platform ground1(-225.0f, -boundaryY + PLAYER_SIZE * 0.5f, 0.0f, 350.0f, PLAYER_SIZE);
+	Platform ground2(225.0f, -boundaryY + PLAYER_SIZE * 0.5f, 0.0f, 350.0f, PLAYER_SIZE);
+	platforms1.push_back(ground1);
+	platforms1.push_back(ground2);
+	Platform p1(0, -10, 0, boundaryX, 50);
+	Platform p2(0, -180, 0, boundaryX, 50);
+	Platform p3(0, 160, 0, boundaryX, 50);
+	platforms1.push_back(Platform(p1));
+	platforms1.push_back(Platform(p2));
+	platforms1.push_back(Platform(p3));
 	platforms1.push_back(Platform(325, 160, 0, 50, 50));
 	platforms1.push_back(Platform(-325, 160, 0, 50, 50));
 	platforms1.push_back(Platform(325, -10, 0, 50, 50));
@@ -238,6 +280,11 @@ void initialize() {
 	walls1.push_back(Wall(boundaryX - PLAYER_SIZE / 2.0, 0, 0, PLAYER_SIZE, WINDOW_HEIGHT));
 	walls1.push_back(Wall(-boundaryX + PLAYER_SIZE / 2.0, 0,0, PLAYER_SIZE, WINDOW_HEIGHT));
 	stage1.setWalls(walls1);
+
+	vector<Monster> monsters1;
+	Monster m1(0, 210, 0, 50); m1.setPlatform(p1);
+	monsters1.push_back(m1);
+	stage1.setMonsters(monsters1);
 
 	stages.push_back(stage1);
 }

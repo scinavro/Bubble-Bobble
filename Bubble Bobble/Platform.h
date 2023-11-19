@@ -5,6 +5,7 @@
 class Platform
 {
 public:
+	Platform();
 	Platform(float x, float y, float z, float w, float h);
 
 	float getTopEdge() const;

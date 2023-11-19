@@ -39,5 +39,6 @@ void Stage::draw() const {
 	}
 	for (auto& monster : Monsters) {
 		monster.draw();
+
 	}
 }

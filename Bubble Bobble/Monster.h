@@ -1,5 +1,8 @@
 #pragma once
 #include"Vector3f.h"
+#include "Platform.h"
+#include<vector>
+using namespace std;
 
 class Monster {
 	enum class FACE { LEFT, RIGHT };
@@ -11,10 +14,20 @@ public:
 	void setVelocity(const Vector3f& v);
 	Vector3f getVelocity() const;
 
+	void setPlatform(const Platform& p);
+	Platform getPlatform()const;
+
 	void move();
 	void setFace(FACE f);
 	void draw() const;
+
+	void setMonsterlifedead();
+
+	vector<Vector3f> getvertex();
+
 private:
+	bool monsterlife;
+	Platform platform;
 	Vector3f center;
 	Vector3f velocity;
 	float size;

@@ -2,6 +2,7 @@
 #include"Platform.h"
 #include<GL/freeglut.h>
 
+Platform::Platform(){}
 Platform::Platform(float x, float y, float z, float w, float h) {
 	center[0] = x; center[1] = y; center[2] = z; width = w; height = h;
 }

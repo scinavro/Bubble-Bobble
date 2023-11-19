@@ -36,9 +36,10 @@ public:
 
 	void draw() const;
 
+	float getSize();
+
 private:
-	int firstvelocitycount;
-	bool isdragoninair;
+	bool playerlife;
 	Vector3f center;
 	Vector3f horizontalvelocity;
 	Vector3f verticalvelocity;

@@ -1,12 +1,15 @@
 #include"Monster.h"
+#include<iostream>
 #include<GL/freeglut.h>
 
+using namespace std;
+
 Monster::Monster(float x, float y, float z, float size) {
-	center[0] = x; center[1] = y; center[2] = z; this->size = size; velocity[0] = 5.0f; face = FACE::LEFT; monsterlife = true;
+	center[0] = x; center[1] = y; center[2] = z; this->size = size; velocity[0] = -5.0f; face = FACE::LEFT; monsterLife = true;
 }
 
 void Monster::setMonsterlifedead(){
-	monsterlife = false;
+	monsterLife = false;
 }
 
 void Monster::setPlatform(const Platform& p) {
@@ -49,11 +52,13 @@ vector<Vector3f> Monster::getvertex() {
 
 void Monster::move() {
 	if (face == FACE::LEFT) {
-		center = center - velocity;
+		velocity[0] = -5.0f;
 	}
 	else if (face == FACE::RIGHT) {
-		center = center + velocity;
+		velocity[0] = 5.0f;
 	}
+	center = center + velocity;
+
 	if (face == FACE::LEFT && center[0] <= platform.getLeftEdge() + size / 2.0) {
 		setFace(FACE::RIGHT);
 	}
@@ -64,8 +69,8 @@ void Monster::move() {
 }
 
 void Monster::draw() const {
-	if (monsterlife == true) {
-		glColor3f(1.0f, 0.0f, 0.0f);
+	if (monsterLife == true) {
+		glColor3f(1.0f, 1.0f, 0.0f);
 		glBegin(GL_POLYGON);
 		glVertex3f(center[0] + size / 2, center[1] + size / 2, center[2]);
 		glVertex3f(center[0] - size / 2, center[1] + size / 2, center[2]);

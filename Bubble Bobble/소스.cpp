@@ -37,10 +37,10 @@ bool wallCollision(const vector<Wall>& walls, Player& player) {
 			wallCollided = true;
 			Vector3f newCenter = player.getCenter();
 			if (player.getHorizontalVelocity()[0] > 0) {
-				newCenter[0] = wall.getLeftEdge() - PLAYER_SIZE / 2.0 - 1;
+				newCenter[0] = wall.getLeftEdge() - PLAYER_SIZE / 2.0 - 0.001;
 			}
 			else if (player.getHorizontalVelocity()[0] < 0) {
-				newCenter[0] = wall.getRightEdge() + PLAYER_SIZE / 2.0 + 1;
+				newCenter[0] = wall.getRightEdge() + PLAYER_SIZE / 2.0 + 0.001;
 			}
 			/*else if (player.getVerticalVelocity()[1] > 0) {
 				newCenter[1] = wall.getBottomEdge() - PLAYER_SIZE / 2.0;
@@ -122,6 +122,25 @@ void MonsterDeathHanler(vector<Monster>& monsters, vector<Bubble> bubbles) {
 	}
 }
 
+bool BubbleCollidedWall(Bubble &bubble) {
+	bool BubbleCollided = false;
+	Vector3f center = bubble.getCenter();
+	for (auto wall : stages[0].getWalls()) {
+		if ((center[0]-bubble.getRadius()<=wall.getRightEdge()&&center[0]-bubble.getRadius()>=wall.getLeftEdge())|| (center[0] + bubble.getRadius() >= wall.getLeftEdge() && center[0] + bubble.getRadius() <= wall.getRightEdge())) {
+			BubbleCollided = true;
+			Vector3f newCenter = bubble.getCenter();
+			if (bubble.getVelocity()[0] > 0) {
+				newCenter[0] = wall.getLeftEdge() - 30;
+			}
+			else if (bubble.getVelocity()[0] < 0) {
+				newCenter[0] = wall.getRightEdge() + 30;
+			}
+			bubble.setCenter(newCenter);
+		}
+	}
+	return BubbleCollided;
+}
+
 void idle() {
 	/* Implement */
 	end_t = clock();
@@ -131,13 +150,23 @@ void idle() {
 		player.horizontalmove();
 		player.verticalmove();
 		for (auto &bub : bubbles) {
-			if (bub.getRadius() == 30) {
+			bub.move();
+			if (bub.getRadius() >= 30) { 
+				bub.setRadius(30);
 				Vector3f v(0.0f, 3.0f, 0.0f);
 				bub.setVelocity(v);
 			}
-			bub.move();
-			if (bub.getRadius() != 30) {
-				bub.setRadius(bub.getRadius() + 2.0f);
+			else {
+				float BubbleSizeVelocity = 2.0f;
+				if(BubbleCollidedWall(bub)) {
+					Vector3f v(0.0f, 0.0f, 0.0f);
+					bub.setVelocity(v);
+					BubbleSizeVelocity = 7.0f;
+				}
+				else {
+					BubbleSizeVelocity = 2.0f;
+				}
+				bub.setRadius(bub.getRadius() + BubbleSizeVelocity);
 			}
 		}
 		for (auto& stage : stages) {

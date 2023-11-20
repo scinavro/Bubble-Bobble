@@ -26,7 +26,7 @@ public:
 	vector<Vector3f> getvertex();
 
 private:
-	bool monsterlife;
+	bool monsterLife;
 	Platform platform;
 	Vector3f center;
 	Vector3f velocity;

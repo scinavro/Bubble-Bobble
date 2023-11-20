@@ -109,8 +109,6 @@ Player::VERTICAL_STATE Player::getVerticalState() {
 
 void Player::horizontalmove() {
 
-	Vector3f horizontalvelocity;
-
 	if (horizontalState == HORIZONTAL_STATE::MOVE) {
 		if (face == FACE::RIGHT) {
 			//velocity[0] = 5.0f;

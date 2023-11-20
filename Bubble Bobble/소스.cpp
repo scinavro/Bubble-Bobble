@@ -20,24 +20,27 @@ Light light(boundaryX, boundaryY, boundaryX / 2, GL_LIGHT0);
 clock_t start_t = clock();
 clock_t end_t;
 
-Player player(0.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
+Player player(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
 vector<Bubble> bubbles;
 vector<Stage> stages;
+
+bool blockedByWall;
 
 bool wallCollision(const vector<Wall>& walls, Player& player) {
 	bool wallCollided = false;
 	Vector3f center = player.getCenter();
+	blockedByWall = false;
 
 	for (auto wall : walls) {
-		if (wall.getTopEdge() >= center[1] - PLAYER_SIZE/2.0 && wall.getBottomEdge() <= center[1] + PLAYER_SIZE / 2.0 &&
-			wall.getLeftEdge() <= center[0] + PLAYER_SIZE / 2.0 && wall.getRightEdge() >= center[0] - PLAYER_SIZE / 2.0) {
+		if (wall.getTopEdge() > center[1] - PLAYER_SIZE/2.0 && wall.getBottomEdge() < center[1] + PLAYER_SIZE / 2.0 &&
+			wall.getLeftEdge() < center[0] + PLAYER_SIZE / 2.0 && wall.getRightEdge() > center[0] - PLAYER_SIZE / 2.0) {
 			wallCollided = true;
 			Vector3f newCenter = player.getCenter();
 			if (player.getHorizontalVelocity()[0] > 0) {
-				newCenter[0] = wall.getLeftEdge() - PLAYER_SIZE / 2.0;
+				newCenter[0] = wall.getLeftEdge() - PLAYER_SIZE / 2.0 - 1;
 			}
 			else if (player.getHorizontalVelocity()[0] < 0) {
-				newCenter[0] = wall.getRightEdge() + PLAYER_SIZE / 2.0;
+				newCenter[0] = wall.getRightEdge() + PLAYER_SIZE / 2.0 + 1;
 			}
 			/*else if (player.getVerticalVelocity()[1] > 0) {
 				newCenter[1] = wall.getBottomEdge() - PLAYER_SIZE / 2.0;
@@ -46,6 +49,7 @@ bool wallCollision(const vector<Wall>& walls, Player& player) {
 				newCenter[1] = wall.getTopEdge() + PLAYER_SIZE / 2.0;
 			}*/
 			player.setCenter(newCenter);
+			blockedByWall = true;
 		}
 	}
 
@@ -57,8 +61,8 @@ bool platformCollision(const vector<Platform>& platforms, Player& player) {
 	Vector3f center = player.getCenter();
 
 	for (auto& platform : platforms) {
-		if (platform.getTopEdge() >= center[1] - PLAYER_SIZE / 2.0 && platform.getBottomEdge() <= center[1] + PLAYER_SIZE / 2.0 &&
-			platform.getLeftEdge() <= center[0] + PLAYER_SIZE / 2.0 && platform.getRightEdge() >= center[0] - PLAYER_SIZE / 2.0) {
+		if (platform.getTopEdge() > center[1] - PLAYER_SIZE / 2.0 && platform.getBottomEdge() < center[1] + PLAYER_SIZE / 2.0 &&
+			platform.getLeftEdge() < center[0] + PLAYER_SIZE / 2.0 && platform.getRightEdge() > center[0] - PLAYER_SIZE / 2.0) {
 			platformCollided = true;
 			Vector3f newCenter = player.getCenter();
 			newCenter[1] = platform.getTopEdge() + PLAYER_SIZE / 2.0;
@@ -124,7 +128,6 @@ void idle() {
 
 	if ((float)(end_t - start_t) > 1000 / 30.0f) {
 		start_t = end_t;
-
 		player.horizontalmove();
 		player.verticalmove();
 		for (auto &bub : bubbles) {
@@ -145,10 +148,7 @@ void idle() {
 		//MonsterDeathHanler(stages[0].getMonsters(), bubbles);  이 부분에서 에러남
 
 		collisionHandler(stages[0], player);
-
 		
-
-
 	}
 
 	glutPostRedisplay();
@@ -211,12 +211,14 @@ void specialKeyDown(int key, int x, int y) {
 	switch (key) {
 		case GLUT_KEY_LEFT:
 			player.setFace(Player::FACE::LEFT);
-			player.setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
+			if (!blockedByWall)
+				player.setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
 			break;
 
 		case GLUT_KEY_RIGHT:
 			player.setFace(Player::FACE::RIGHT);
-			player.setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
+			if (!blockedByWall)
+				player.setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
 			break;
 
 		case GLUT_KEY_UP:

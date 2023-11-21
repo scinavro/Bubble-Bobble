@@ -2,7 +2,7 @@
 #include<GL/freeglut.h>
 
 Player::Player(float x, float y, float z, float size){
-	center[0] = x; center[1] = y; center[2] = z; this->size = size; face = FACE::LEFT; playerlife = true;
+	center[0] = x; center[1] = y; center[2] = z; this->size = size; face = FACE::LEFT; playerLife = true;
 }
 
 float Player::getSize() {
@@ -15,16 +15,16 @@ Vector3f Player::getCenter() const {
 	return center;
 }
 void Player::setHorizontalVelocity(const Vector3f& v) {
-	horizontalvelocity = v;
+	HorizontalVelocity = v;
 }
 Vector3f Player::getHorizontalVelocity() const {
-	return horizontalvelocity;
+	return HorizontalVelocity;
 }
 void Player::setVerticalVelocity(const Vector3f& v) {
-	verticalvelocity = v;
+	VerticalVelocity = v;
 }
 Vector3f Player::getVerticalVelocity() const {
-	return verticalvelocity;
+	return VerticalVelocity;
 }
 void Player::setAcceleration(const Vector3f& a) {
 	acceleration = a;
@@ -62,14 +62,14 @@ void Player::setVerticalState(VERTICAL_STATE vState) {
 }
 Bubble Player::shootBubble() {
 	Bubble bub(2, 20, 20);
-	Vector3f bubblevelocity;
-	bubblevelocity.setPos(15.0f, 0.0f, 0.0f);
+	Vector3f BubbleVelocity;
+	BubbleVelocity.setPos(15.0f, 0.0f, 0.0f);
 	bub.setCenter(center);
 	if (face == FACE::LEFT) {
-		bub.setVelocity(-1 * bubblevelocity);
+		bub.setVelocity(-1 * BubbleVelocity);
 	}
 	else if (face == FACE::RIGHT) {
-		bub.setVelocity(bubblevelocity);
+		bub.setVelocity(BubbleVelocity);
 	}
 
 
@@ -112,36 +112,35 @@ void Player::horizontalmove() {
 	if (horizontalState == HORIZONTAL_STATE::MOVE) {
 		if (face == FACE::RIGHT) {
 			//velocity[0] = 5.0f;
-			horizontalvelocity.setPos(5.0f, 0.0f, 0.0f);
+			HorizontalVelocity.setPos(5.0f, 0.0f, 0.0f);
 		}
 		else if (face == FACE::LEFT) {
 			//velocity[0] = -5.0f;
-			horizontalvelocity.setPos(-5.0f, 0.0f, 0.0f);
+			HorizontalVelocity.setPos(-5.0f, 0.0f, 0.0f);
 		}
-		center = center + horizontalvelocity;
+		center = center + HorizontalVelocity;
 	}
 	else{
-		horizontalvelocity[0] = 0.0f;
+		HorizontalVelocity[0] = 0.0f;
 	}
 	
 }
 void Player::verticalmove() {
 	if (verticalState == VERTICAL_STATE::JUMP) {
 		acceleration[1] = -2.0f;
-		verticalvelocity = verticalvelocity + acceleration;
-		center = center + verticalvelocity;
+		VerticalVelocity = VerticalVelocity + acceleration;
+		center = center + VerticalVelocity;
 	}
 	else if (verticalState == VERTICAL_STATE::FALL) {
-		verticalvelocity[1] = -20.0f;
-		center = center + verticalvelocity;
+		VerticalVelocity[1] = -20.0f;
+		center = center + VerticalVelocity;
 	}
 	else {
-		verticalvelocity[1] = 0.0f;
+		VerticalVelocity[1] = 0.0f;
 		acceleration[1] = 0.0f;
 	}
 }
 void Player::draw() const {
-	
 
 	glColor3f(0.0f, 1.0f, 0.0f);
 	glBegin(GL_POLYGON);

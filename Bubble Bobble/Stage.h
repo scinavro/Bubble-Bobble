@@ -17,6 +17,8 @@ public:
 	vector<Wall> getWalls() const;
 	vector<Monster> getMonsters() const;
 
+	// void eraseMonster(int i); 더 보완하기
+
 	void setstageFinished();
 	bool getstageFinished();
 

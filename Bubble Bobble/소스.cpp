@@ -111,8 +111,8 @@ bool MonsterBubbleCollision(vector<Vector3f>vertexes, Bubble bubble) {
 	return bubblemonstercollided;
 }
 
-void MonsterDeathHanler(vector<Monster>& monsters, vector<Bubble> bubbles) {
-	for (auto& monster : monsters) {
+void MonsterDeathHanler(const Stage& stage, vector<Bubble> bubbles) {
+	for (auto& monster : stage.getMonsters()) {
 		for (auto& bubble : bubbles) {
 			if (MonsterBubbleCollision(monster.getvertex(), bubble)) {
 				monster.setMonsterlifedead();
@@ -145,7 +145,7 @@ void idle() {
 	/* Implement */
 	end_t = clock();
 
-	if ((float)(end_t - start_t) > 1000 / 30.0f) {
+	if ((float)(end_t - start_t) > 1000 / 60.0f) {
 		start_t = end_t;
 		player.horizontalmove();
 		player.verticalmove();
@@ -171,10 +171,18 @@ void idle() {
 		}
 		for (auto& stage : stages) {
 			for (auto& monster : stage.getMonsters()) {
-				monster.move();
+				if (monster.getMonsterLife()) {
+					monster.move();
+				}
+				else {
+					// monster erase 해결하기
+				}
+				
 			}
 		}
-		//MonsterDeathHanler(stages[0].getMonsters(), bubbles);  이 부분에서 에러남
+
+
+		MonsterDeathHanler(stages[0], bubbles); 
 
 		collisionHandler(stages[0], player);
 		

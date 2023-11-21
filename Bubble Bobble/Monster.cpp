@@ -11,6 +11,9 @@ Monster::Monster(float x, float y, float z, float size) {
 void Monster::setMonsterlifedead(){
 	monsterLife = false;
 }
+bool Monster::getMonsterLife() {
+	return monsterLife;
+}
 
 void Monster::setPlatform(const Platform& p) {
 	platform = p;

@@ -22,6 +22,7 @@ public:
 	void draw() const;
 
 	void setMonsterlifedead();
+	bool getMonsterLife();
 
 	vector<Vector3f> getvertex();
 

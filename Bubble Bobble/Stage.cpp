@@ -20,9 +20,12 @@ vector<Wall> Stage::getWalls() const {
 	return Walls;
 }
 
-vector<Monster> Stage::getMonsters() const {
+vector<Monster> Stage::getMonsters()const{
 	return Monsters;
 }
+/*void Stage::eraseMonster(int i) {
+	Monsters.erase(Monsters.begin()+i);
+}*/
 
 void Stage::setstageFinished() {
 	isFinished = true;

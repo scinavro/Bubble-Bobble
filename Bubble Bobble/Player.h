@@ -39,10 +39,10 @@ public:
 	float getSize();
 
 private:
-	bool playerlife;
+	bool playerLife;
 	Vector3f center;
-	Vector3f horizontalvelocity;
-	Vector3f verticalvelocity;
+	Vector3f HorizontalVelocity;
+	Vector3f VerticalVelocity;
 	Vector3f acceleration;
 	Vector3f current_center;
 	float size;

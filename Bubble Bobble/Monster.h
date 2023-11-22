@@ -26,7 +26,11 @@ public:
 
 	vector<Vector3f> getvertex();
 
+	void setMonsterId(int);
+	int getMonsterId();
+
 private:
+	int monsterId;
 	bool monsterLife;
 	Platform platform;
 	Vector3f center;

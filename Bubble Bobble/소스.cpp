@@ -124,6 +124,28 @@ void MonsterDeathHanler(Stage& stage, vector<Bubble> bubbles) {
 	}
 }
 
+bool PlayerMonsterCollision(vector<Vector3f>vertexes, Player &player) {
+	bool playerMonsterCollided = false;
+	for (auto& vertex : vertexes) {
+		if (vertex[0]<=player.getCenter()[0]+player.getSize()/2.0 && vertex[0] >= player.getCenter()[0] - player.getSize() / 2.0&& vertex[1] <= player.getCenter()[1] + player.getSize() / 2.0 && vertex[1] >= player.getCenter()[1] - player.getSize() / 2.0 ){
+			playerMonsterCollided = true;
+			break;
+		}
+	}
+	return playerMonsterCollided;
+}
+
+void PlayerDeathHanler(Stage& stage,Player &player) {
+	for (auto& monster : stage.monstersControl()) {
+		if (PlayerMonsterCollision(monster.getvertex(), player)) {
+			player.PlayerLifeDeduced();
+			Vector3f newCenter(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f,0.0f);
+			player.setCenter(newCenter);
+			break;
+		}
+	}
+}
+
 bool BubbleCollidedWall(Bubble &bubble) {
 	bool BubbleCollided = false;
 	Vector3f center = bubble.getCenter();
@@ -143,51 +165,74 @@ bool BubbleCollidedWall(Bubble &bubble) {
 	return BubbleCollided;
 }
 
+void displayCharacters(void* font, string str, float x, float y) {
+	glRasterPos2f(x, y);
+	for (int i = 0; i < str.size(); i++) {
+		glutBitmapCharacter(font, str[i]);
+	}
+}
+
 void idle() {
 	/* Implement */
 	end_t = clock();
 
-	if ((float)(end_t - start_t) > 1000 / 60.0f) {
-		start_t = end_t;
-		player.horizontalmove();
-		player.verticalmove();
-		for (auto &bub : bubbles) {
-			bub.move();
-			if (bub.getRadius() >= 30) { 
-				bub.setRadius(30);
-				Vector3f v(0.0f, 3.0f, 0.0f);
-				bub.setVelocity(v);
-			}
-			else {
-				float BubbleSizeVelocity = 2.0f;
-				if(BubbleCollidedWall(bub)) {
-					Vector3f v(0.0f, 0.0f, 0.0f);
+	if (player.getPlayerLife() == 0) {
+
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER DEAD ------ GAME END",-700.0f, 700.0f);
+		glFlush();
+
+		if (end_t - start_t > 5000) {
+			exit;
+		}
+
+	}
+	else {
+		if ((float)(end_t - start_t) > 1000 / 60.0f) {
+			start_t = end_t;
+
+			player.horizontalmove();
+			player.verticalmove();
+			for (auto& bub : bubbles) {
+				bub.move();
+				if (bub.getRadius() >= 30) {
+					bub.setRadius(30);
+					Vector3f v(0.0f, 3.0f, 0.0f);
 					bub.setVelocity(v);
-					BubbleSizeVelocity = 7.0f;
 				}
 				else {
-					BubbleSizeVelocity = 2.0f;
+					float BubbleSizeVelocity = 2.0f;
+					if (BubbleCollidedWall(bub)) {
+						Vector3f v(0.0f, 0.0f, 0.0f);
+						bub.setVelocity(v);
+						BubbleSizeVelocity = 7.0f;
+					}
+					else {
+						BubbleSizeVelocity = 2.0f;
+					}
+					bub.setRadius(bub.getRadius() + BubbleSizeVelocity);
 				}
-				bub.setRadius(bub.getRadius() + BubbleSizeVelocity);
 			}
-		}
-		for (auto& stage : stages) {
-			for (auto& monster : stage.monstersControl()) {
-				if (monster.getMonsterLife()) {
-					monster.move();
+			for (auto& stage : stages) {
+				for (auto& monster : stage.monstersControl()) {
+					if (monster.getMonsterLife()) {
+						monster.move();
+					}
+					else {
+						// monster erase 해결하기
+						stage.eraseMonster(monster.getMonsterId());
+					}
+
 				}
-				else {
-					// monster erase 해결하기
-				}
-				
 			}
+
+			MonsterDeathHanler(stages[0], bubbles);
+			PlayerDeathHanler(stages[0], player);
+			collisionHandler(stages[0], player);
+
 		}
-
-
-		MonsterDeathHanler(stages[0], bubbles); 
-
-		collisionHandler(stages[0], player);
-		
 	}
 
 	glutPostRedisplay();
@@ -323,7 +368,7 @@ void initialize() {
 	stage1.setWalls(walls1);
 
 	vector<Monster> monsters1;
-	Monster m1(50); m1.setPlatform(p1);
+	Monster m1(50); m1.setPlatform(p1); m1.setMonsterId(0);
 	monsters1.push_back(m1);
 	stage1.setMonsters(monsters1);
 

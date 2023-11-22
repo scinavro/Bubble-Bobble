@@ -2,10 +2,16 @@
 #include<GL/freeglut.h>
 
 Player::Player(float x, float y, float z, float size){
-	center[0] = x; center[1] = y; center[2] = z; this->size = size; face = FACE::LEFT; playerLife = true;
-	texture.initializeTexture("snu.png");
+	center[0] = x; center[1] = y; center[2] = z; this->size = size; face = FACE::LEFT; playerLife = 3;
+	texture.initializeTexture("bubble.png");
 }
 
+int Player::getPlayerLife() {
+	return playerLife;
+}
+void Player::PlayerLifeDeduced() {
+	playerLife -= 1;
+}
 float Player::getSize() {
 	return size;
 }
@@ -150,24 +156,25 @@ void Player::draw(){
 	glVertex3f(center[0] - size / 2, center[1] - size / 2, center[2]);
 	glVertex3f(center[0] + size / 2, center[1] - size / 2, center[2]);
 	glEnd();*/
+	if (playerLife != 0) {
+		texture.setcenter(center);
+		texture.setSize(size);
+		texture.texture();
 
-	texture.setcenter(center);
-	texture.setSize(size);
-	texture.texture();
+		if (face == FACE::RIGHT) {
+			glColor3f(0.0f, 0.0f, 1.0f);
+			glPointSize(10.0f);
+			glBegin(GL_POINTS);
+			glVertex2f(center[0] + size / 2, center[1]);
+			glEnd();
 
-	if (face ==FACE:: RIGHT) {
-		glColor3f(0.0f, 0.0f, 1.0f);
-		glPointSize(10.0f);
-		glBegin(GL_POINTS);
-		glVertex2f(center[0] + size / 2, center[1]);
-		glEnd();
-
-	}
-	else if (face == FACE::LEFT) {
-		glColor3f(0.0f, 0.0f, 1.0f);
-		glPointSize(10.0f);
-		glBegin(GL_POINTS);
-		glVertex2f(center[0] - size / 2, center[1]);
-		glEnd();
+		}
+		else if (face == FACE::LEFT) {
+			glColor3f(0.0f, 0.0f, 1.0f);
+			glPointSize(10.0f);
+			glBegin(GL_POINTS);
+			glVertex2f(center[0] - size / 2, center[1]);
+			glEnd();
+		}
 	}
 }

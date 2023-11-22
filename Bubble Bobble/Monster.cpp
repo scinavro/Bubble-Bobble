@@ -8,6 +8,12 @@ Monster::Monster(float size) {
 	this->size = size; velocity[0] = -5.0f; face = FACE::LEFT; monsterLife = true;
 	velocity = { 0, 0, 0 };
 }
+void Monster::setMonsterId(int i) {
+	monsterId = i;
+}
+int Monster::getMonsterId() {
+	return monsterId;
+}
 
 void Monster::setMonsterlifedead(){
 	monsterLife = false;

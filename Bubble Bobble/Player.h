@@ -12,6 +12,10 @@ public:
 
 	Player(float x, float y, float z, float size);
 
+	int getPlayerLife();
+
+	void PlayerLifeDeduced();
+
 	void setCenter(const Vector3f& c);
 	Vector3f getCenter() const;
 
@@ -40,7 +44,7 @@ public:
 	float getSize();
 
 private:
-	bool playerLife;
+	int playerLife;
 	Vector3f center;
 	Vector3f HorizontalVelocity;
 	Vector3f VerticalVelocity;

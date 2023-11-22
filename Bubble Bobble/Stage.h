@@ -17,7 +17,7 @@ public:
 	vector<Wall> getWalls() const;
 	vector<Monster>& monstersControl();
 
-	// void eraseMonster(int i); �� �����ϱ�
+	void eraseMonster(int i);
 
 	void setstageFinished();
 	bool getstageFinished();

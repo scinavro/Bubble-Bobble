@@ -23,9 +23,9 @@ vector<Wall> Stage::getWalls() const {
 vector<Monster>& Stage::monstersControl(){
 	return Monsters;
 }
-/*void Stage::eraseMonster(int i) {
-	Monsters.erase(Monsters.begin()+i);
-}*/
+void Stage::eraseMonster(int i) {
+    Monsters.erase(Monsters.begin()+i);
+}
 
 void Stage::setstageFinished() {
 	isFinished = true;

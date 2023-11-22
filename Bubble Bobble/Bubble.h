@@ -1,6 +1,7 @@
 #pragma once
-
+#include<vector>
 #include "Material.h"
+using namespace std;
 
 class Bubble {
 public:
@@ -16,11 +17,15 @@ public:
 	Vector3f getCenter() const;
 	void setVelocity(const Vector3f& v);
 	Vector3f getVelocity() const;
+	void setAcceleration(const Vector3f& a);
+	Vector3f getAcceleration() const;
 	
 	void setMTL(const Material& m);
 
 	void move();
 	void draw() const;
+
+	vector<Bubble> pop();
 
 private:
 	float radius;
@@ -29,5 +34,6 @@ private:
 
 	Vector3f center;
 	Vector3f velocity;
+	Vector3f acceleration;
 	Material mtl;
 };

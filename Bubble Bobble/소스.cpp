@@ -24,6 +24,7 @@ clock_t end_t;
 
 Player player(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
 vector<Bubble> bubbles;
+vector<Bubble> smallbubbles;
 vector<Stage> stages;
 
 bool blockedByWall;
@@ -34,7 +35,7 @@ bool wallCollision(const vector<Wall>& walls, Player& player) {
 	blockedByWall = false;
 
 	for (auto wall : walls) {
-		if (wall.getTopEdge() > center[1] - PLAYER_SIZE/2.0 && wall.getBottomEdge() < center[1] + PLAYER_SIZE / 2.0 &&
+		if (wall.getTopEdge() > center[1] - PLAYER_SIZE / 2.0 && wall.getBottomEdge() < center[1] + PLAYER_SIZE / 2.0 &&
 			wall.getLeftEdge() < center[0] + PLAYER_SIZE / 2.0 && wall.getRightEdge() > center[0] - PLAYER_SIZE / 2.0) {
 			wallCollided = true;
 			Vector3f newCenter = player.getCenter();
@@ -96,7 +97,7 @@ void collisionHandler(const Stage& stage, Player& player) {
 			}
 		}
 	}
-	if (player.getCenter()[1] - player.getSize()/2.0 <= -boundaryY) {
+	if (player.getCenter()[1] - player.getSize() / 2.0 <= -boundaryY) {
 		player.setCenter(Vector3f(player.getCenter()[0], player.getCenter()[1] + boundaryY * 2, 0));
 	}
 }
@@ -124,10 +125,35 @@ void MonsterDeathHanler(Stage& stage, vector<Bubble> bubbles) {
 	}
 }
 
-bool PlayerMonsterCollision(vector<Vector3f>vertexes, Player &player) {
+bool PlayerBubbleCollision(vector<Vector3f>vertexes, Bubble bubble) {
+	bool playerBubbleCollided = false;
+	for (auto& vertex : vertexes) {
+		float distance = sqrt(pow(bubble.getCenter()[0] - vertex[0], 2) + pow(bubble.getCenter()[1] - vertex[1], 2));
+		if (distance <= bubble.getRadius()) {
+			playerBubbleCollided = true;
+			break;
+		}
+	}
+	return playerBubbleCollided;
+}
+
+void PlayerBubblePop(Player& player, vector<Bubble>& bubbles) {
+	for (int i = 0; i < bubbles.size();) {
+		if (MonsterBubbleCollision(player.getvertex(), bubbles[i])) {
+			bubbles[i].pop();
+			bubbles.erase(bubbles.begin() + i);
+		}
+		else {
+			i++;
+		}
+	}
+
+}
+
+bool PlayerMonsterCollision(vector<Vector3f>vertexes, Player& player) {
 	bool playerMonsterCollided = false;
 	for (auto& vertex : vertexes) {
-		if (vertex[0]<=player.getCenter()[0]+player.getSize()/2.0 && vertex[0] >= player.getCenter()[0] - player.getSize() / 2.0&& vertex[1] <= player.getCenter()[1] + player.getSize() / 2.0 && vertex[1] >= player.getCenter()[1] - player.getSize() / 2.0 ){
+		if (vertex[0] <= player.getCenter()[0] + player.getSize() / 2.0 && vertex[0] >= player.getCenter()[0] - player.getSize() / 2.0 && vertex[1] <= player.getCenter()[1] + player.getSize() / 2.0 && vertex[1] >= player.getCenter()[1] - player.getSize() / 2.0) {
 			playerMonsterCollided = true;
 			break;
 		}
@@ -135,22 +161,22 @@ bool PlayerMonsterCollision(vector<Vector3f>vertexes, Player &player) {
 	return playerMonsterCollided;
 }
 
-void PlayerDeathHanler(Stage& stage,Player &player) {
+void PlayerDeathHanler(Stage& stage, Player& player) {
 	for (auto& monster : stage.monstersControl()) {
 		if (PlayerMonsterCollision(monster.getvertex(), player)) {
 			player.PlayerLifeDeduced();
-			Vector3f newCenter(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f,0.0f);
+			Vector3f newCenter(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f);
 			player.setCenter(newCenter);
 			break;
 		}
 	}
 }
 
-bool BubbleCollidedWall(Bubble &bubble) {
+bool BubbleCollidedWall(Bubble& bubble, Stage& stage) {
 	bool BubbleCollided = false;
 	Vector3f center = bubble.getCenter();
-	for (auto wall : stages[0].getWalls()) {
-		if ((center[0]-bubble.getRadius()<=wall.getRightEdge()&&center[0]-bubble.getRadius()>=wall.getLeftEdge())|| (center[0] + bubble.getRadius() >= wall.getLeftEdge() && center[0] + bubble.getRadius() <= wall.getRightEdge())) {
+	for (auto wall : stage.getWalls()) {
+		if ((center[0] - bubble.getRadius() <= wall.getRightEdge() && center[0] - bubble.getRadius() >= wall.getLeftEdge()) || (center[0] + bubble.getRadius() >= wall.getLeftEdge() && center[0] + bubble.getRadius() <= wall.getRightEdge())) {
 			BubbleCollided = true;
 			Vector3f newCenter = bubble.getCenter();
 			if (bubble.getVelocity()[0] > 0) {
@@ -180,8 +206,13 @@ void idle() {
 
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(-boundaryX, boundaryX, -boundaryY, boundaryY, -100.0, 100.0);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
 		glColor3f(1.0f, 1.0f, 1.0f);
-		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER DEAD ------ GAME END",-700.0f, 700.0f);
+		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER DEAD ------ GAME END",-100.0f, 100.0f);
 		glFlush();
 
 		if (end_t - start_t > 5000) {
@@ -204,7 +235,7 @@ void idle() {
 				}
 				else {
 					float BubbleSizeVelocity = 2.0f;
-					if (BubbleCollidedWall(bub)) {
+					if (BubbleCollidedWall(bub,stages[0])) {
 						Vector3f v(0.0f, 0.0f, 0.0f);
 						bub.setVelocity(v);
 						BubbleSizeVelocity = 7.0f;
@@ -213,6 +244,12 @@ void idle() {
 						BubbleSizeVelocity = 2.0f;
 					}
 					bub.setRadius(bub.getRadius() + BubbleSizeVelocity);
+				}
+			}
+			for (auto& bub : smallbubbles) {
+				bub.move();
+				if (bub.getAcceleration()[2] == -9) {
+					smallbubbles.clear();
 				}
 			}
 			for (auto& stage : stages) {
@@ -229,6 +266,7 @@ void idle() {
 			}
 
 			MonsterDeathHanler(stages[0], bubbles);
+			PlayerBubblePop(player, bubbles);
 			PlayerDeathHanler(stages[0], player);
 			collisionHandler(stages[0], player);
 
@@ -267,6 +305,9 @@ void display() {
 	/* Implement: Draw bubbles */
 
 	for (auto& bub : bubbles) {
+		bub.draw();
+	}
+	for (auto& bub : smallbubbles) {
 		bub.draw();
 	}
 

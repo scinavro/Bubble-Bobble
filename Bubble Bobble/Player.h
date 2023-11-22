@@ -2,6 +2,8 @@
 
 #include "Bubble.h"
 #include "Texture.h"
+#include<vector>
+using namespace std;
 
 class Player
 {
@@ -42,6 +44,8 @@ public:
 	void draw();
 
 	float getSize();
+
+	vector<Vector3f> getvertex();
 
 private:
 	int playerLife;

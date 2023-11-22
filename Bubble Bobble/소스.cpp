@@ -79,7 +79,7 @@ bool platformCollision(const vector<Platform>& platforms, Player& player) {
 void collisionHandler(const Stage& stage, Player& player) {
 	vector<Platform> platforms = stage.getPlatforms();
 	vector<Wall> walls = stage.getWalls();
-	vector<Monster> monsters = stage.getMonsters();
+	//vector<Monster> monsters = stage.monster();
 
 	if (wallCollision(walls, player)) {
 		player.setHorizontalState(Player::HORIZONTAL_STATE::STOP);
@@ -113,8 +113,8 @@ bool MonsterBubbleCollision(vector<Vector3f>vertexes, Bubble bubble) {
 	return bubblemonstercollided;
 }
 
-void MonsterDeathHanler(const Stage& stage, vector<Bubble> bubbles) {
-	for (auto& monster : stage.getMonsters()) {
+void MonsterDeathHanler(Stage& stage, vector<Bubble> bubbles) {
+	for (auto& monster : stage.monstersControl()) {
 		for (auto& bubble : bubbles) {
 			if (MonsterBubbleCollision(monster.getvertex(), bubble)) {
 				monster.setMonsterlifedead();
@@ -172,7 +172,7 @@ void idle() {
 			}
 		}
 		for (auto& stage : stages) {
-			for (auto& monster : stage.getMonsters()) {
+			for (auto& monster : stage.monstersControl()) {
 				if (monster.getMonsterLife()) {
 					monster.move();
 				}
@@ -323,7 +323,7 @@ void initialize() {
 	stage1.setWalls(walls1);
 
 	vector<Monster> monsters1;
-	Monster m1(0, 210, 0, 50); m1.setPlatform(p1);
+	Monster m1(50); m1.setPlatform(p1);
 	monsters1.push_back(m1);
 	stage1.setMonsters(monsters1);
 

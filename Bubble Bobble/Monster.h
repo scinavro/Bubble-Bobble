@@ -7,7 +7,7 @@ using namespace std;
 class Monster {
 	enum class FACE { LEFT, RIGHT };
 public:
-	Monster(float x, float y, float z, float size);
+	Monster(float size);
 	void setCenter(const Vector3f& c);
 	Vector3f getCenter() const;
 

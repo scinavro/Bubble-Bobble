@@ -4,8 +4,9 @@
 
 using namespace std;
 
-Monster::Monster(float x, float y, float z, float size) {
-	center[0] = x; center[1] = y; center[2] = z; this->size = size; velocity[0] = -5.0f; face = FACE::LEFT; monsterLife = true;
+Monster::Monster(float size) {
+	this->size = size; velocity[0] = -5.0f; face = FACE::LEFT; monsterLife = true;
+	velocity = { 0, 0, 0 };
 }
 
 void Monster::setMonsterlifedead(){
@@ -17,6 +18,9 @@ bool Monster::getMonsterLife() {
 
 void Monster::setPlatform(const Platform& p) {
 	platform = p;
+	center[0] = (platform.getLeftEdge() + platform.getRightEdge()) / 2.0f;
+	center[1] = platform.getTopEdge() + size / 2.0f;
+	center[2] = 0;
 }
 Platform Monster::getPlatform() const {
 	return platform;

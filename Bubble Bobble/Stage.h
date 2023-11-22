@@ -15,9 +15,9 @@ public:
 
 	vector<Platform> getPlatforms() const;
 	vector<Wall> getWalls() const;
-	vector<Monster> getMonsters() const;
+	vector<Monster>& monstersControl();
 
-	// void eraseMonster(int i); ╢У ╨╦©ого╠Б
+	// void eraseMonster(int i); О©╫О©╫ О©╫О©╫О©╫О©╫О©╫о╠О©╫
 
 	void setstageFinished();
 	bool getstageFinished();

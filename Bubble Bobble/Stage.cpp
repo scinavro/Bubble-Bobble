@@ -20,7 +20,7 @@ vector<Wall> Stage::getWalls() const {
 	return Walls;
 }
 
-vector<Monster> Stage::getMonsters()const{
+vector<Monster>& Stage::monstersControl(){
 	return Monsters;
 }
 /*void Stage::eraseMonster(int i) {

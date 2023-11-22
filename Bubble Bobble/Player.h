@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Bubble.h"
+#include "Texture.h"
 
 class Player
 {
@@ -34,7 +35,7 @@ public:
 	HORIZONTAL_STATE getHorizontalState();
 	VERTICAL_STATE getVerticalState();
 
-	void draw() const;
+	void draw();
 
 	float getSize();
 
@@ -49,5 +50,6 @@ private:
 	FACE face;
 	HORIZONTAL_STATE horizontalState;
 	VERTICAL_STATE verticalState;
+	Texture texture;
 };
 

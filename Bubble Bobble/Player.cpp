@@ -3,6 +3,7 @@
 
 Player::Player(float x, float y, float z, float size){
 	center[0] = x; center[1] = y; center[2] = z; this->size = size; face = FACE::LEFT; playerLife = true;
+	texture.initializeTexture("snu.png");
 }
 
 float Player::getSize() {
@@ -140,15 +141,19 @@ void Player::verticalmove() {
 		acceleration[1] = 0.0f;
 	}
 }
-void Player::draw() const {
+void Player::draw(){
 
-	glColor3f(0.0f, 1.0f, 0.0f);
+	/*glColor3f(0.0f, 1.0f, 0.0f);
 	glBegin(GL_POLYGON);
 	glVertex3f(center[0] + size / 2, center[1] + size / 2, center[2]);
 	glVertex3f(center[0] - size / 2, center[1] + size / 2, center[2]);
 	glVertex3f(center[0] - size / 2, center[1] - size / 2, center[2]);
 	glVertex3f(center[0] + size / 2, center[1] - size / 2, center[2]);
-	glEnd();
+	glEnd();*/
+
+	texture.setcenter(center);
+	texture.setSize(size);
+	texture.texture();
 
 	if (face ==FACE:: RIGHT) {
 		glColor3f(0.0f, 0.0f, 1.0f);

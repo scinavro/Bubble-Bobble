@@ -110,7 +110,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>freeglut.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -137,6 +137,7 @@
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Stage.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vector3f.cpp" />
     <ClCompile Include="Vector4f.cpp" />
     <ClCompile Include="Wall.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="Platform.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Stage.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Vector3f.h" />
     <ClInclude Include="Vector4f.h" />
     <ClInclude Include="Wall.h" />

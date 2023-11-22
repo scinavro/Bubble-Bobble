@@ -11,6 +11,8 @@
 #include "Stage.h"
 #include"Wall.h"
 
+#include"Texture.h"
+
 #include <GL/freeglut.h>
 
 using namespace std;

@@ -24,7 +24,11 @@ vector<Monster>& Stage::monstersControl(){
 	return Monsters;
 }
 void Stage::eraseMonster(int i) {
-    Monsters.erase(Monsters.begin()+i);
+	for (int m = 0; m < monstersControl().size(); m++) {
+		if (monstersControl()[m].getMonsterId() == i) {
+			Monsters.erase(Monsters.begin() + m);
+		}
+	}
 }
 
 void Stage::setstageFinished() {

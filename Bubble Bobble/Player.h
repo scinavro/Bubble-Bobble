@@ -18,6 +18,8 @@ public:
 
 	void PlayerLifeDeduced();
 
+	Texture getTexture();
+
 	void setCenter(const Vector3f& c);
 	Vector3f getCenter() const;
 

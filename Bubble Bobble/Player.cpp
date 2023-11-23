@@ -6,6 +6,9 @@ Player::Player(float x, float y, float z, float size){
 	texture.initializeTexture("bubble.png");
 }
 
+Texture Player::getTexture() {
+	return texture;
+}
 vector<Vector3f> Player::getvertex() {
 	vector<Vector3f> vertex;
 	Vector3f v1(center[0] + size / 2, center[1] + size / 2, center[2]); vertex.push_back(v1);

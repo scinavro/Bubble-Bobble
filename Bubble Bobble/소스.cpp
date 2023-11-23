@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include<cmath>
+#include<chrono>
+#include<thread>
 
 #include "Constants.h"
 #include "Light.h"
@@ -26,6 +28,8 @@ Player player(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
 vector<Bubble> bubbles;
 vector<Bubble> smallbubbles;
 vector<Stage> stages;
+Texture endImage;
+int currentStage = 0;
 
 bool blockedByWall;
 
@@ -203,22 +207,7 @@ void idle() {
 	end_t = clock();
 
 	if (player.getPlayerLife() == 0) {
-
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(-boundaryX, boundaryX, -boundaryY, boundaryY, -100.0, 100.0);
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glColor3f(1.0f, 1.0f, 1.0f);
-		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER DEAD ------ GAME END",-100.0f, 100.0f);
-		glFlush();
-
-		if (end_t - start_t > 5000) {
-			exit;
-		}
-
+		exit;
 	}
 	else {
 		if ((float)(end_t - start_t) > 1000 / 60.0f) {
@@ -252,23 +241,19 @@ void idle() {
 					smallbubbles.clear();
 				}
 			}
-			for (auto& stage : stages) {
-				for (auto& monster : stage.monstersControl()) {
-					if (monster.getMonsterLife()) {
-						monster.move();
-					}
-					else {
-						// monster erase 해결하기
-						stage.eraseMonster(monster.getMonsterId());
-					}
-
+			for (auto& monster : stages[currentStage].monstersControl()) {
+				if (monster.getMonsterLife()) {
+					monster.move();
+				}
+				else {
+					stages[currentStage].eraseMonster(monster.getMonsterId());
 				}
 			}
 
-			MonsterDeathHanler(stages[0], bubbles);
+			MonsterDeathHanler(stages[currentStage], bubbles);
 			PlayerBubblePop(player, bubbles);
-			PlayerDeathHanler(stages[0], player);
-			collisionHandler(stages[0], player);
+			PlayerDeathHanler(stages[currentStage], player);
+			collisionHandler(stages[currentStage], player);
 
 		}
 	}
@@ -288,38 +273,74 @@ void display() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	// Draw 2D
-	player.draw();
-
-	// Draw 3D
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
-	glEnable(light.getID());
-
-	light.setAmbient(0.5f, 0.5f, 0.5f, 1.0f);
-	light.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
-	light.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-
-	light.draw();
-
-	/* Implement: Draw bubbles */
-
-	for (auto& bub : bubbles) {
-		bub.draw();
+	if (player.getPlayerLife() == 0) {
+		glColor3f(1.0f, 1.0f, 1.0f);
+		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER DEAD ------ GAME END", -100.0f, 100.0f);
 	}
-	for (auto& bub : smallbubbles) {
-		bub.draw();
+	else if (player.getPlayerLife() == 1) {
+		glColor3f(1.0f, 0.0f, 0.0f);
+		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER LIFE : 1", -330.0f, 380.0f);
+	}
+	else if (player.getPlayerLife() == 2) {
+		glColor3f(1.0f, 0.0f, 0.0f);
+		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER LIFE : 2", -330.0f, 380.0f);
+	}
+	else if (player.getPlayerLife() == 3) {
+		glColor3f(1.0f, 0.0f, 0.0f);
+		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER LIFE : 3", -330.0f, 380.0f);
 	}
 
-	for (auto& stage : stages) {
-		stage.draw();
+	if (stages[currentStage].monstersControl().size() == 0) {
+		currentStage += 1;
+		Vector3f center(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f);
+		player.setCenter(center);
+	}
+	if (currentStage == 2) {
+		Vector3f center(0, 0, 0);
+		endImage.setcenter(center);
+		endImage.setSize(200);
+		endImage.texture();
+		
 	}
 
-	glDisable(light.getID());
-	glDisable(GL_LIGHTING);
-	glDisable(GL_DEPTH_TEST);
+	if (currentStage < stages.size()) {
+		// Draw 2D
+		player.draw();
+
+		// Draw 3D
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_LIGHTING);
+		glEnable(light.getID());
+
+		light.setAmbient(0.5f, 0.5f, 0.5f, 1.0f);
+		light.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
+		light.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+
+		light.draw();
+
+		/* Implement: Draw bubbles */
+
+		for (auto& bub : bubbles) {
+			bub.draw();
+		}
+		for (auto& bub : smallbubbles) {
+			bub.draw();
+		}
+		stages[currentStage].draw();
+
+		glDisable(light.getID());
+		glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
+	}
+	
 
 	glutSwapBuffers();
+
+	if (currentStage == 2) {
+		chrono::seconds waittime(5);
+		this_thread::sleep_for(waittime);
+		exit(0);
+	}
 }
 
 void keyboardDown(unsigned char key, int x, int y) {
@@ -379,6 +400,7 @@ void specialKeyUp(int key, int x, int y) {
 }
 
 void initialize() {
+	endImage.initializeTexture("GameOver.png");
 	player.setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 	player.setVerticalState(Player::VERTICAL_STATE::STOP);
 
@@ -412,8 +434,49 @@ void initialize() {
 	Monster m1(50); m1.setPlatform(p1); m1.setMonsterId(0);
 	monsters1.push_back(m1);
 	stage1.setMonsters(monsters1);
+	Monster m2(50); m2.setPlatform(p2); m2.setMonsterId(1);
+	monsters1.push_back(m2);
+	stage1.setMonsters(monsters1);
+	Monster m3(50); m3.setPlatform(p3); m3.setMonsterId(2);
+	monsters1.push_back(m3);
+	stage1.setMonsters(monsters1);
 
 	stages.push_back(stage1);
+
+	Stage stage2(1);
+
+	vector<Platform> platforms2;
+	Platform ground3(0.0f, -boundaryY + PLAYER_SIZE * 0.5f, 0.0f, boundaryX * 2, PLAYER_SIZE);
+	platforms2.push_back(ground3);
+	Platform p4(0, -10, 0, boundaryX, 50);
+	Platform p5(0, -180, 0, boundaryX, 50);
+	Platform p6(0, 160, 0, boundaryX, 50);
+	platforms2.push_back(Platform(p4));
+	platforms2.push_back(Platform(p5));
+	platforms2.push_back(Platform(p6));
+	stage2.setPlatforms(platforms2);
+
+	vector<Wall> walls2;
+	walls2.push_back(Wall(-boundaryX + PLAYER_SIZE * 0.5f, -225.0f, 0.0f, PLAYER_SIZE, 350.0f));
+	walls2.push_back(Wall(-boundaryX + PLAYER_SIZE * 0.5f, 225.0f, 0.0f, PLAYER_SIZE, 350.0f));
+	walls2.push_back(Wall(+boundaryX - PLAYER_SIZE * 0.5f, -225.0f, 0.0f, PLAYER_SIZE, 350.0f));
+	walls2.push_back(Wall(+boundaryX - PLAYER_SIZE * 0.5f, 225.0f, 0.0f, PLAYER_SIZE, 350.0f));
+	stage2.setWalls(walls2);
+
+	vector<Monster> monsters2;
+	Monster m4(50); m4.setPlatform(p4); m4.setMonsterId(3);
+	monsters2.push_back(m4);
+	stage2.setMonsters(monsters2);
+	Monster m5(50); m5.setPlatform(p5); m5.setMonsterId(4);
+	monsters2.push_back(m5);
+	stage2.setMonsters(monsters2);
+	Monster m6(50); m6.setPlatform(p6); m6.setMonsterId(5);
+	monsters2.push_back(m6);
+	stage2.setMonsters(monsters2);
+
+	stages.push_back(stage2);
+
+	
 }
 
 int main(int argc, char** argv) {

@@ -161,33 +161,7 @@ void Player::verticalmove() {
 	}
 }
 void Player::draw(){
-
-	/*glColor3f(0.0f, 1.0f, 0.0f);
-	glBegin(GL_POLYGON);
-	glVertex3f(center[0] + size / 2, center[1] + size / 2, center[2]);
-	glVertex3f(center[0] - size / 2, center[1] + size / 2, center[2]);
-	glVertex3f(center[0] - size / 2, center[1] - size / 2, center[2]);
-	glVertex3f(center[0] + size / 2, center[1] - size / 2, center[2]);
-	glEnd();*/
-	if (playerLife != 0) {
-		texture.setcenter(center);
-		texture.setSize(size);
-		texture.texture();
-
-		if (face == FACE::RIGHT) {
-			glColor3f(0.0f, 0.0f, 1.0f);
-			glPointSize(10.0f);
-			glBegin(GL_POINTS);
-			glVertex2f(center[0] + size / 2, center[1]);
-			glEnd();
-
-		}
-		else if (face == FACE::LEFT) {
-			glColor3f(0.0f, 0.0f, 1.0f);
-			glPointSize(10.0f);
-			glBegin(GL_POINTS);
-			glVertex2f(center[0] - size / 2, center[1]);
-			glEnd();
-		}
-	}
+	texture.setcenter(center);
+	texture.setSize(size);
+	texture.texture();
 }

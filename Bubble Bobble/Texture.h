@@ -10,6 +10,7 @@ public:
 	void setcenter(Vector3f & c);
 	Vector3f getcenter();
 	void setSize(float s);
+	void setWidthHeight(float w, float h);
 
 	FIBITMAP* createBitMap(char const* filename);
 	void generateTexture();
@@ -23,6 +24,7 @@ public:
 
 	int imagewidth, imageheight;
 	float size;
+	float width, height;
 private:
 	Vector3f center;
 

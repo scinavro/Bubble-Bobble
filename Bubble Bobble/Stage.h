@@ -22,7 +22,7 @@ public:
 	void setstageFinished();
 	bool getstageFinished();
 
-	void draw() const;
+	void draw();
 
 private:
 	int stageID;

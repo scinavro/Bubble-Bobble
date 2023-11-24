@@ -37,7 +37,7 @@ void Stage::setstageFinished() {
 bool Stage::getstageFinished() {
 	return isFinished;
 }
-void Stage::draw() const {
+void Stage::draw() {
 	for (auto& platform : Platforms) {
 		platform.draw();
 	}

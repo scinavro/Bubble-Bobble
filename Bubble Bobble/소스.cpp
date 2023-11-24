@@ -7,7 +7,7 @@
 #include "Constants.h"
 #include "Light.h"
 
-#include "Player.h"
+#include "player.h"
 #include "Platform.h"
 
 #include "Stage.h"
@@ -19,12 +19,12 @@
 
 using namespace std;
 
-Light light(boundaryX, boundaryY, boundaryX / 2, GL_LIGHT0);
+Light light(boundaryX, boundaryY, -boundaryX / 2, GL_LIGHT0);
 
 clock_t start_t = clock();
 clock_t end_t;
 
-Player player(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
+Player* player;
 vector<Bubble> bubbles;
 vector<Bubble> smallbubbles;
 vector<Stage> stages;
@@ -33,29 +33,29 @@ int currentStage = 0;
 
 bool blockedByWall;
 
-bool wallCollision(const vector<Wall>& walls, Player& player) {
+bool wallCollision(const vector<Wall>& walls, Player* player) {
 	bool wallCollided = false;
-	Vector3f center = player.getCenter();
+	Vector3f center = player->getCenter();
 	blockedByWall = false;
 
 	for (auto wall : walls) {
 		if (wall.getTopEdge() > center[1] - PLAYER_SIZE / 2.0 && wall.getBottomEdge() < center[1] + PLAYER_SIZE / 2.0 &&
 			wall.getLeftEdge() < center[0] + PLAYER_SIZE / 2.0 && wall.getRightEdge() > center[0] - PLAYER_SIZE / 2.0) {
 			wallCollided = true;
-			Vector3f newCenter = player.getCenter();
-			if (player.getHorizontalVelocity()[0] > 0) {
+			Vector3f newCenter = player->getCenter();
+			if (player->getHorizontalVelocity()[0] > 0) {
 				newCenter[0] = wall.getLeftEdge() - PLAYER_SIZE / 2.0 - 0.001;
 			}
-			else if (player.getHorizontalVelocity()[0] < 0) {
+			else if (player->getHorizontalVelocity()[0] < 0) {
 				newCenter[0] = wall.getRightEdge() + PLAYER_SIZE / 2.0 + 0.001;
 			}
-			/*else if (player.getVerticalVelocity()[1] > 0) {
+			/*else if (player->getVerticalVelocity()[1] > 0) {
 				newCenter[1] = wall.getBottomEdge() - PLAYER_SIZE / 2.0;
 			}
-			else if (player.getVerticalVelocity()[1] <= 0) {
+			else if (player->getVerticalVelocity()[1] <= 0) {
 				newCenter[1] = wall.getTopEdge() + PLAYER_SIZE / 2.0;
 			}*/
-			player.setCenter(newCenter);
+			player->setCenter(newCenter);
 			blockedByWall = true;
 		}
 	}
@@ -63,17 +63,17 @@ bool wallCollision(const vector<Wall>& walls, Player& player) {
 	return wallCollided;
 }
 
-bool platformCollision(const vector<Platform>& platforms, Player& player) {
+bool platformCollision(const vector<Platform>& platforms, Player* player) {
 	bool platformCollided = false;
-	Vector3f center = player.getCenter();
+	Vector3f center = player->getCenter();
 
 	for (auto& platform : platforms) {
 		if (platform.getTopEdge() > center[1] - PLAYER_SIZE / 2.0 && platform.getBottomEdge() < center[1] + PLAYER_SIZE / 2.0 &&
 			platform.getLeftEdge() < center[0] + PLAYER_SIZE / 2.0 && platform.getRightEdge() > center[0] - PLAYER_SIZE / 2.0) {
 			platformCollided = true;
-			Vector3f newCenter = player.getCenter();
+			Vector3f newCenter = player->getCenter();
 			newCenter[1] = platform.getTopEdge() + PLAYER_SIZE / 2.0;
-			player.setCenter(newCenter);
+			player->setCenter(newCenter);
 		}
 	}
 
@@ -81,49 +81,50 @@ bool platformCollision(const vector<Platform>& platforms, Player& player) {
 }
 
 
-void collisionHandler(const Stage& stage, Player& player) {
+void collisionHandler(const Stage& stage, Player* player) {
 	vector<Platform> platforms = stage.getPlatforms();
 	vector<Wall> walls = stage.getWalls();
 	//vector<Monster> monsters = stage.monster();
 
 	if (wallCollision(walls, player)) {
-		player.setHorizontalState(Player::HORIZONTAL_STATE::STOP);
+		player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 	}
-	if (player.getVerticalVelocity()[1] <= 0) {
+	if (player->getVerticalVelocity()[1] <= 0) {
 		// platform과 닿아있는 상태 (STOP)
 		if (platformCollision(platforms, player)) {
-			player.setVerticalState(Player::VERTICAL_STATE::STOP);
+			player->setVerticalState(Player::VERTICAL_STATE::STOP);
 		}
 		// platform에 닿아있다가 떨어지는 상태 (FALL)
 		else {
-			if (player.getAcceleration()[1] == 0) {
-				player.setVerticalState(Player::VERTICAL_STATE::FALL);
+			if (player->getAcceleration()[1] == 0) {
+				player->setVerticalState(Player::VERTICAL_STATE::FALL);
 			}
 		}
 	}
-	if (player.getCenter()[1] - player.getSize() / 2.0 <= -boundaryY) {
-		player.setCenter(Vector3f(player.getCenter()[0], player.getCenter()[1] + boundaryY * 2, 0));
+	if (player->getCenter()[1] - player->getSize() / 2.0 <= -boundaryY) {
+		player->setCenter(Vector3f(player->getCenter()[0], player->getCenter()[1] + boundaryY * 2, 0));
 	}
 }
 
-bool MonsterBubbleCollision(vector<Vector3f>vertexes, Bubble bubble) {
+bool MonsterBubbleCollision(Monster monster, Bubble bubble) {
 	bool bubblemonstercollided = false;
-	for (auto& vertex : vertexes) {
-		float distance = sqrt(pow(bubble.getCenter()[0] - vertex[0], 2) + pow(bubble.getCenter()[1] - vertex[1], 2));
-		if (distance <= bubble.getRadius()) {
-			bubblemonstercollided = true;
-			break;
-		}
+	
+	float distance = sqrt(pow(monster.getCenter()[0] - bubble.getCenter()[0], 2) + pow(monster.getCenter()[1] - bubble.getCenter()[1], 2));
+	if (distance <= PLAYER_SIZE/2) {
+		bubblemonstercollided = true;
 	}
+	
 	return bubblemonstercollided;
 }
 
 void MonsterDeathHanler(Stage& stage, vector<Bubble> bubbles) {
 	for (auto& monster : stage.monstersControl()) {
 		for (auto& bubble : bubbles) {
-			if (MonsterBubbleCollision(monster.getvertex(), bubble)) {
-				monster.setMonsterlifedead();
-				break;
+			if (bubble.getRadius() < 30) {
+				if (MonsterBubbleCollision(monster, bubble)) {
+					monster.setMonsterlifedead();
+					break;
+				}
 			}
 		}
 	}
@@ -141,23 +142,23 @@ bool PlayerBubbleCollision(vector<Vector3f>vertexes, Bubble bubble) {
 	return playerBubbleCollided;
 }
 
-void PlayerBubblePop(Player& player, vector<Bubble>& bubbles) {
-	for (int i = 0; i < bubbles.size();) {
-		if (MonsterBubbleCollision(player.getvertex(), bubbles[i])) {
+void PlayerBubblePop(Player* player, vector<Bubble>& bubbles) {
+	/*for (int i = 0; i < bubbles.size();) {
+		if (MonsterBubbleCollision(player->getvertex(), bubbles[i])) {
 			bubbles[i].pop();
 			bubbles.erase(bubbles.begin() + i);
 		}
 		else {
 			i++;
 		}
-	}
+	}*/
 
 }
 
-bool PlayerMonsterCollision(vector<Vector3f>vertexes, Player& player) {
+bool PlayerMonsterCollision(vector<Vector3f>vertexes, Player* player) {
 	bool playerMonsterCollided = false;
 	for (auto& vertex : vertexes) {
-		if (vertex[0] <= player.getCenter()[0] + player.getSize() / 2.0 && vertex[0] >= player.getCenter()[0] - player.getSize() / 2.0 && vertex[1] <= player.getCenter()[1] + player.getSize() / 2.0 && vertex[1] >= player.getCenter()[1] - player.getSize() / 2.0) {
+		if (vertex[0] <= player->getCenter()[0] + player->getSize() / 2.0 && vertex[0] >= player->getCenter()[0] - player->getSize() / 2.0 && vertex[1] <= player->getCenter()[1] + player->getSize() / 2.0 && vertex[1] >= player->getCenter()[1] - player->getSize() / 2.0) {
 			playerMonsterCollided = true;
 			break;
 		}
@@ -165,12 +166,12 @@ bool PlayerMonsterCollision(vector<Vector3f>vertexes, Player& player) {
 	return playerMonsterCollided;
 }
 
-void PlayerDeathHanler(Stage& stage, Player& player) {
+void PlayerDeathHanler(Stage& stage, Player* player) {
 	for (auto& monster : stage.monstersControl()) {
 		if (PlayerMonsterCollision(monster.getvertex(), player)) {
-			player.PlayerLifeDeduced();
+			player->PlayerLifeDeduced();
 			Vector3f newCenter(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f);
-			player.setCenter(newCenter);
+			player->setCenter(newCenter);
 			break;
 		}
 	}
@@ -206,15 +207,18 @@ void idle() {
 	/* Implement */
 	end_t = clock();
 
-	if (player.getPlayerLife() == 0) {
+	if (player->getPlayerLife() == 0) {
 		exit;
 	}
 	else {
 		if ((float)(end_t - start_t) > 1000 / 60.0f) {
+			if (player->getVerticalState() == Player::VERTICAL_STATE::STOP) {
+				std::cout << "stop";
+			}
 			start_t = end_t;
 
-			player.horizontalmove();
-			player.verticalmove();
+			player->horizontalmove();
+			player->verticalmove();
 			for (auto& bub : bubbles) {
 				bub.move();
 				if (bub.getRadius() >= 30) {
@@ -249,7 +253,7 @@ void idle() {
 					stages[currentStage].eraseMonster(monster.getMonsterId());
 				}
 			}
-
+			
 			MonsterDeathHanler(stages[currentStage], bubbles);
 			PlayerBubblePop(player, bubbles);
 			PlayerDeathHanler(stages[currentStage], player);
@@ -273,19 +277,19 @@ void display() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	if (player.getPlayerLife() == 0) {
+	if (player->getPlayerLife() == 0) {
 		glColor3f(1.0f, 1.0f, 1.0f);
 		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER DEAD ------ GAME END", -100.0f, 100.0f);
 	}
-	else if (player.getPlayerLife() == 1) {
+	else if (player->getPlayerLife() == 1) {
 		glColor3f(1.0f, 0.0f, 0.0f);
 		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER LIFE : 1", -330.0f, 380.0f);
 	}
-	else if (player.getPlayerLife() == 2) {
+	else if (player->getPlayerLife() == 2) {
 		glColor3f(1.0f, 0.0f, 0.0f);
 		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER LIFE : 2", -330.0f, 380.0f);
 	}
-	else if (player.getPlayerLife() == 3) {
+	else if (player->getPlayerLife() == 3) {
 		glColor3f(1.0f, 0.0f, 0.0f);
 		displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER LIFE : 3", -330.0f, 380.0f);
 	}
@@ -293,7 +297,7 @@ void display() {
 	if (stages[currentStage].monstersControl().size() == 0) {
 		currentStage += 1;
 		Vector3f center(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f);
-		player.setCenter(center);
+		player->setCenter(center);
 	}
 	if (currentStage == 2) {
 		Vector3f center(0, 0, 0);
@@ -305,15 +309,15 @@ void display() {
 
 	if (currentStage < stages.size()) {
 		// Draw 2D
-		player.draw();
-
+		player->draw();
+		
 		// Draw 3D
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_LIGHTING);
 		glEnable(light.getID());
 
-		light.setAmbient(0.5f, 0.5f, 0.5f, 1.0f);
-		light.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
+		light.setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
+		light.setDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
 		light.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
 
 		light.draw();
@@ -326,11 +330,13 @@ void display() {
 		for (auto& bub : smallbubbles) {
 			bub.draw();
 		}
-		stages[currentStage].draw();
 
 		glDisable(light.getID());
 		glDisable(GL_LIGHTING);
 		glDisable(GL_DEPTH_TEST);
+
+
+		stages[currentStage].draw();
 	}
 	
 
@@ -346,7 +352,7 @@ void display() {
 void keyboardDown(unsigned char key, int x, int y) {
 	/* Implement */
 	if (key == ' ') {
-		bubbles.push_back(player.shootBubble());
+		bubbles.push_back(player->shootBubble());
 	}
 	
 
@@ -356,23 +362,23 @@ void specialKeyDown(int key, int x, int y) {
 	/* Implement */
 	switch (key) {
 		case GLUT_KEY_LEFT:
-			player.setFace(Player::FACE::LEFT);
+			player->setFace(Player::FACE::LEFT);
 			if (!blockedByWall)
-				player.setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
+				player->setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
 			break;
 
 		case GLUT_KEY_RIGHT:
-			player.setFace(Player::FACE::RIGHT);
+			player->setFace(Player::FACE::RIGHT);
 			if (!blockedByWall)
-				player.setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
+				player->setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
 			break;
 
 		case GLUT_KEY_UP:
-			if (player.getVerticalState() == Player::VERTICAL_STATE::STOP) {
-				Vector3f newVelocity = player.getVerticalVelocity();
+			if (player->getVerticalVelocity()[1] < 0.001 || player->getVerticalVelocity()[1] > -0.001) {
+				Vector3f newVelocity = player->getVerticalVelocity();
 				newVelocity[1] = 30.0f;
-				player.setVerticalVelocity(newVelocity);
-				player.setVerticalState(Player::VERTICAL_STATE::JUMP);
+				player->setVerticalVelocity(newVelocity);
+				player->setVerticalState(Player::VERTICAL_STATE::JUMP);
 			}
 			break;
 
@@ -387,11 +393,11 @@ void specialKeyUp(int key, int x, int y) {
 
 	switch (key) {
 	case GLUT_KEY_LEFT:
-		player.setHorizontalState(Player::HORIZONTAL_STATE::STOP);
+		player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 		break;
 
 	case GLUT_KEY_RIGHT:
-		player.setHorizontalState(Player::HORIZONTAL_STATE::STOP);
+		player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 		break;
 
 	default:
@@ -400,9 +406,10 @@ void specialKeyUp(int key, int x, int y) {
 }
 
 void initialize() {
+	player = new Player(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
 	endImage.initializeTexture("GameOver.png");
-	player.setHorizontalState(Player::HORIZONTAL_STATE::STOP);
-	player.setVerticalState(Player::VERTICAL_STATE::STOP);
+	player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
+	player->setVerticalState(Player::VERTICAL_STATE::STOP);
 
 	Stage stage1(0);
 	

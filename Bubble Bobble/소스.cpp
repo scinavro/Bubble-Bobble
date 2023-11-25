@@ -68,8 +68,8 @@ bool platformCollision(const vector<Platform>& platforms, Player* player) {
 	Vector3f center = player->getCenter();
 
 	for (auto& platform : platforms) {
-		if (platform.getTopEdge() > center[1] - PLAYER_SIZE / 2.0 && platform.getBottomEdge() < center[1] + PLAYER_SIZE / 2.0 &&
-			platform.getLeftEdge() < center[0] + PLAYER_SIZE / 2.0 && platform.getRightEdge() > center[0] - PLAYER_SIZE / 2.0) {
+		if (platform.getTopEdge() >= center[1] - PLAYER_SIZE / 2.0 && platform.getBottomEdge() <= center[1] + PLAYER_SIZE / 2.0 &&
+			platform.getLeftEdge() <= center[0] + PLAYER_SIZE / 2.0 && platform.getRightEdge() >= center[0] - PLAYER_SIZE / 2.0) {
 			platformCollided = true;
 			Vector3f newCenter = player->getCenter();
 			newCenter[1] = platform.getTopEdge() + PLAYER_SIZE / 2.0;
@@ -89,16 +89,16 @@ void collisionHandler(const Stage& stage, Player* player) {
 	if (wallCollision(walls, player)) {
 		player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 	}
-	if (player->getVerticalVelocity()[1] <= 0) {
-		// platform과 닿아있는 상태 (STOP)
+	// 떨어지다가 Platform과 닿으면 STOP으로 변환
+	if (player->getVerticalVelocity()[1] < 0) {
 		if (platformCollision(platforms, player)) {
 			player->setVerticalState(Player::VERTICAL_STATE::STOP);
 		}
-		// platform에 닿아있다가 떨어지는 상태 (FALL)
-		else {
-			if (player->getAcceleration()[1] == 0) {
-				player->setVerticalState(Player::VERTICAL_STATE::FALL);
-			}
+	}
+	// platform에 닿아있다가 떨어지면 FALL로 변환
+	if (player->getVerticalVelocity()[1] == 0 && player->getAcceleration()[1] == 0) {
+		if (!platformCollision(platforms, player)) {
+			player->setVerticalState(Player::VERTICAL_STATE::FALL);
 		}
 	}
 	if (player->getCenter()[1] - player->getSize() / 2.0 <= -boundaryY) {
@@ -212,9 +212,6 @@ void idle() {
 	}
 	else {
 		if ((float)(end_t - start_t) > 1000 / 60.0f) {
-			if (player->getVerticalState() == Player::VERTICAL_STATE::STOP) {
-				std::cout << "stop";
-			}
 			start_t = end_t;
 
 			player->horizontalmove();
@@ -266,7 +263,30 @@ void idle() {
 	
 }
 
+ostream& operator<<(std::ostream& out, Player::VERTICAL_STATE vState) {
+	switch (vState)
+	{
+	case Player::VERTICAL_STATE::STOP:
+		out << "stop" << endl;
+		break;
+
+	case Player::VERTICAL_STATE::JUMP:
+		out << "jump" << endl;
+		break;
+
+	case Player::VERTICAL_STATE::FALL:
+		out << "fall" << endl;
+		break;
+
+	default:
+		break;
+	}
+
+	return out;
+}
+
 void display() {
+	std::cout << player->getVerticalState() << endl;
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -374,7 +394,7 @@ void specialKeyDown(int key, int x, int y) {
 			break;
 
 		case GLUT_KEY_UP:
-			if (player->getVerticalVelocity()[1] < 0.001 || player->getVerticalVelocity()[1] > -0.001) {
+			if (player->getVerticalVelocity()[1] < 1 && player->getVerticalVelocity()[1] > -1) {
 				Vector3f newVelocity = player->getVerticalVelocity();
 				newVelocity[1] = 30.0f;
 				player->setVerticalVelocity(newVelocity);

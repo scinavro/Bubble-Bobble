@@ -5,7 +5,20 @@
 
 Bubble::Bubble(){}
 Bubble::Bubble(float r, int sl, int st) {
-	radius = r; slice = sl; stack = st;
+	radius = r; slice = sl; stack = st; status = Bubble::STATUS::NORMAL;
+}
+void Bubble::setMonsterId(int id) {
+	trappingMonsterId = id;
+}
+int Bubble::getMonsterId() {
+	return trappingMonsterId;
+}
+
+Bubble::STATUS Bubble::getStatus() {
+	return status;
+}
+void Bubble::setBubbleTrapping() {
+	status = Bubble::STATUS::TRAPPING;
 }
 
 void Bubble::setRadius(float r) {
@@ -49,31 +62,31 @@ void Bubble::move() {
 	center = center + velocity;
 }
 void Bubble::draw() const {
+	
+		float getambient[4] = { mtl.getAmbient()[0], mtl.getAmbient()[1], mtl.getAmbient()[2], mtl.getAmbient()[3] };
+		float getdiffuse[4] = { mtl.getDiffuse()[0],mtl.getDiffuse()[1],mtl.getDiffuse()[2],mtl.getDiffuse()[3] };
+		float getspecular[4] = { mtl.getSpecular()[0],mtl.getSpecular()[1],mtl.getSpecular()[2],mtl.getSpecular()[3] };
+		float getemission[4] = { mtl.getEmission()[0] ,mtl.getEmission()[1] ,mtl.getEmission()[2] ,mtl.getEmission()[3] };
+		float shininess[1] = { mtl.getShininess() };
 
-	float getambient[4] = { mtl.getAmbient()[0], mtl.getAmbient()[1], mtl.getAmbient()[2], mtl.getAmbient()[3] };
-	float getdiffuse[4] = { mtl.getDiffuse()[0],mtl.getDiffuse()[1],mtl.getDiffuse()[2],mtl.getDiffuse()[3] };
-	float getspecular[4] = { mtl.getSpecular()[0],mtl.getSpecular()[1],mtl.getSpecular()[2],mtl.getSpecular()[3] };
-	float getemission[4] = { mtl.getEmission()[0] ,mtl.getEmission()[1] ,mtl.getEmission()[2] ,mtl.getEmission()[3] };
-	float shininess[1] = { mtl.getShininess() };
+		glPushMatrix();
+		glTranslatef(center[0], center[1], center[2]);
 
-	glPushMatrix();
-	glTranslatef(center[0], center[1],center[2]);	
+		glShadeModel(GL_SMOOTH);
 
-	glShadeModel(GL_SMOOTH);
+		glMaterialfv(GL_FRONT, GL_EMISSION, getemission);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, getambient);
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, getdiffuse);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, getspecular);
+		glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
 
-	glMaterialfv(GL_FRONT, GL_EMISSION, getemission);
-	glMaterialfv(GL_FRONT, GL_AMBIENT,getambient);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, getdiffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, getspecular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+		glutSolidSphere(radius, slice, stack);
 
-	glutSolidSphere(radius, slice, stack);
-
-	glPopMatrix();
+		glPopMatrix();
 }
 
 
-void setRandomMaterial(Bubble& bubble) {
+void Bubble::setRandomMaterial() {
 
 	srand((unsigned int)time(0));
 	double emission[4]; emission[3] = 1.0f;
@@ -96,17 +109,17 @@ void setRandomMaterial(Bubble& bubble) {
 	}
 	shininess[0] = rand() % 30 + 1;
 
-	Material mtl;
+	Material random_mtl;
 
-	mtl.setEmission(emission[0], emission[1], emission[2], emission[3]);
-	mtl.setSpecular(specular[0], specular[1], specular[2], specular[3]);
-	mtl.setDiffuse(diffuse[0], diffuse[1], diffuse[2], diffuse[3]);
-	mtl.setAmbient(ambient[0], ambient[1], ambient[2], ambient[3]);
-	mtl.setShininess(shininess[0]);
-	bubble.setMTL(mtl);
+	random_mtl.setEmission(emission[0], emission[1], emission[2], emission[3]);
+	random_mtl.setSpecular(specular[0], specular[1], specular[2], specular[3]);
+	random_mtl.setDiffuse(diffuse[0], diffuse[1], diffuse[2], diffuse[3]);
+	random_mtl.setAmbient(ambient[0], ambient[1], ambient[2], ambient[3]);
+	random_mtl.setShininess(shininess[0]);
+	mtl = random_mtl;
 }
 
-void setRandomVelocity(Bubble& bubble) {
+/*void setRandomVelocity(Bubble& bubble) {
 
 	srand((unsigned int)time(0));
 	Vector3f RandomVelocity;
@@ -129,4 +142,4 @@ vector<Bubble> Bubble::pop() {
 		bubs.push_back(bub);
 	}
 	return bubs;
-}
+}*/

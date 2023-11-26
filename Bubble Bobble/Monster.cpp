@@ -5,7 +5,7 @@
 using namespace std;
 
 Monster::Monster(float size) {
-	this->size = size; velocity[0] = -5.0f; face = FACE::LEFT; monsterLife = true;
+	this->size = size; velocity[0] = -5.0f; face = FACE::LEFT;status = STATUS::LIVE;
 	velocity = { 0, 0, 0 };
 }
 void Monster::setMonsterId(int i) {
@@ -15,11 +15,14 @@ int Monster::getMonsterId() {
 	return monsterId;
 }
 
-void Monster::setMonsterlifedead(){
-	monsterLife = false;
+void Monster::setMonsterlifeTrapped(){
+	status = STATUS::TRAP;
 }
-bool Monster::getMonsterLife() {
-	return monsterLife;
+void Monster::setMonsterLifeDead() {
+	status = STATUS::DEAD;
+}
+Monster::STATUS Monster::getMonsterStatus() {
+	return status;
 }
 
 void Monster::setPlatform(const Platform& p) {
@@ -82,7 +85,7 @@ void Monster::move() {
 }
 
 void Monster::draw() const {
-	if (monsterLife == true) {
+	if (status == Monster::STATUS::LIVE) {
 		glColor3f(1.0f, 1.0f, 0.0f);
 		glBegin(GL_POLYGON);
 		glVertex3f(center[0] + size / 2, center[1] + size / 2, center[2]);

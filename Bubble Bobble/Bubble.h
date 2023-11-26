@@ -5,6 +5,8 @@ using namespace std;
 
 class Bubble {
 public:
+	enum class STATUS{NORMAL, TRAPPING};
+
 	Bubble();
 	Bubble(float r, int sl, int st);
 
@@ -19,15 +21,25 @@ public:
 	Vector3f getVelocity() const;
 	void setAcceleration(const Vector3f& a);
 	Vector3f getAcceleration() const;
+
+	STATUS getStatus();
+	void setBubbleTrapping();
 	
 	void setMTL(const Material& m);
 
 	void move();
 	void draw() const;
 
+	void setRandomMaterial();
+
+	void setMonsterId(int);
+	int getMonsterId();
+
 	vector<Bubble> pop();
 
 private:
+
+	int trappingMonsterId;
 	float radius;
 	int slice;
 	int stack;
@@ -36,4 +48,6 @@ private:
 	Vector3f velocity;
 	Vector3f acceleration;
 	Material mtl;
+
+	STATUS status;
 };

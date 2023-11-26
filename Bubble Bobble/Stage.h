@@ -24,6 +24,8 @@ public:
 
 	void draw();
 
+	void killMonster(int);
+
 private:
 	int stageID;
 	vector<Platform> Platforms;

@@ -31,6 +31,14 @@ void Stage::eraseMonster(int i) {
 	}
 }
 
+void Stage::killMonster(int monsterid) {
+	for (auto& monster : Monsters) {
+		if (monster.getMonsterId() == monsterid) {
+			monster.setMonsterLifeDead();
+		}
+	}
+}
+
 void Stage::setstageFinished() {
 	isFinished = true;
 }

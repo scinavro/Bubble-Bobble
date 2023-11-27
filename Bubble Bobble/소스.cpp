@@ -231,11 +231,13 @@ void MonsterDeathHanler(Stage& stage, vector<Bubble> &bubbles) {
 
 bool PlayerBubbleCollision(vector<Vector3f>vertexes, Bubble bubble) {
 	bool playerBubbleCollided = false;
-	for (auto& vertex : vertexes) {
-		float distance = sqrt(pow(bubble.getCenter()[0] - vertex[0], 2) + pow(bubble.getCenter()[1] - vertex[1], 2));
-		if (distance <= bubble.getRadius()) {
-			playerBubbleCollided = true;
-			break;
+	if (bubble.getRadius() == 30) {
+		for (auto& vertex : vertexes) {
+			float distance = sqrt(pow(bubble.getCenter()[0] - vertex[0], 2) + pow(bubble.getCenter()[1] - vertex[1], 2));
+			if (distance <= bubble.getRadius()) {
+				playerBubbleCollided = true;
+				break;
+			}
 		}
 	}
 	return playerBubbleCollided;
@@ -253,17 +255,18 @@ void BubblePopEffect(Bubble bubble) {
 
 void PlayerBubblePop(Player *player, vector<Bubble>& bubbles) {
 	for (int i = 0; i < bubbles.size();) {
-			if (PlayerBubbleCollision(player->getvertex(), bubbles[i])) {
-				if (bubbles[i].getStatus() == Bubble::STATUS::TRAPPING) {
-					// MONSTER SET DEAD
-					stages[currentStage].killMonster(bubbles[i].getMonsterId());
-				}
-				BubblePopEffect(bubbles[i]);
-				bubbles.erase(bubbles.begin() + i);
+
+		if (PlayerBubbleCollision(player->getvertex(), bubbles[i])) {
+			if (bubbles[i].getStatus() == Bubble::STATUS::TRAPPING) {
+				// MONSTER SET DEAD
+				stages[currentStage].killMonster(bubbles[i].getMonsterId());
 			}
-			else {
-				i++;
-			}
+			BubblePopEffect(bubbles[i]);
+			bubbles.erase(bubbles.begin() + i);
+		}
+		else {
+			i++;
+		}
 	}
 
 }

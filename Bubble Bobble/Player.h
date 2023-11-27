@@ -8,7 +8,7 @@ using namespace std;
 class Player
 {
 public:
-	enum class FACE { LEFT, RIGHT };
+	enum FACE { LEFT, RIGHT };
 	enum class HORIZONTAL_STATE { STOP, MOVE };
 	enum class VERTICAL_STATE { STOP, JUMP, FALL };
 

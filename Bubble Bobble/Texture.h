@@ -2,10 +2,13 @@
 #include<GL/freeglut.h>
 #include <FreeImage.h>
 #include "Vector3f.h"
+
 class Texture {
 public:
 	Texture(){}
+	
 	void texture();
+	void texturePlayer(int);
 
 	void setcenter(Vector3f & c);
 	Vector3f getcenter();

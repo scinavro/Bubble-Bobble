@@ -163,5 +163,5 @@ void Player::verticalmove() {
 void Player::draw(){
 	texture.setcenter(center);
 	texture.setSize(size);
-	texture.texture();
+	texture.texturePlayer(face);
 }

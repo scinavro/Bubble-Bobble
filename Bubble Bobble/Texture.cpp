@@ -55,17 +55,39 @@ void Texture::texture() {
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glColor4f(1.0, 1.0, 1.0, 1.0); // reset gl color
 	glBegin(GL_QUADS);
-	if (size != 0) {
+	if (size != 0) { // 정사각형
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(center[0] - size / 2, center[1] - size / 2);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f(center[0] - size / 2, center[1] + size / 2);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f(center[0] + size / 2, center[1] + size / 2);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f(center[0] + size / 2, center[1] - size / 2);
+	}
+	else { // 직사각형
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(center[0] - width / 2, center[1] - height / 2);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f(center[0] - width / 2, center[1] + height / 2);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f(center[0] + width / 2, center[1] + height / 2);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f(center[0] + width / 2, center[1] - height / 2);
+	}
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+}
+
+void Texture::texturePlayer(int face) {
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glColor4f(1.0, 1.0, 1.0, 1.0); // reset gl color
+	glBegin(GL_QUADS);
+	if (face == 1) {
 		glTexCoord2f(0.0f, 0.0f); glVertex2f(center[0] - size / 2, center[1] - size / 2);
 		glTexCoord2f(0.0f, 1.0f); glVertex2f(center[0] - size / 2, center[1] + size / 2);
 		glTexCoord2f(1.0f, 1.0f); glVertex2f(center[0] + size / 2, center[1] + size / 2);
 		glTexCoord2f(1.0f, 0.0f); glVertex2f(center[0] + size / 2, center[1] - size / 2);
 	}
 	else {
-		glTexCoord2f(0.0f, 0.0f); glVertex2f(center[0] - width / 2, center[1] - height / 2);
-		glTexCoord2f(0.0f, 1.0f); glVertex2f(center[0] - width / 2, center[1] + height / 2);
-		glTexCoord2f(1.0f, 1.0f); glVertex2f(center[0] + width / 2, center[1] + height / 2);
-		glTexCoord2f(1.0f, 0.0f); glVertex2f(center[0] + width / 2, center[1] - height / 2);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(center[0] + size / 2, center[1] - size / 2);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f(center[0] + size / 2, center[1] + size / 2);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f(center[0] - size / 2, center[1] + size / 2);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f(center[0] - size / 2, center[1] - size / 2);
 	}
 	glEnd();
 	glDisable(GL_TEXTURE_2D);

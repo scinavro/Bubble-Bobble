@@ -25,6 +25,7 @@ public:
 	void draw();
 
 	void killMonster(int);
+	Monster findMonster(int);
 
 private:
 	int stageID;

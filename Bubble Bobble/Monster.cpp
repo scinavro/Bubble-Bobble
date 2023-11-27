@@ -5,9 +5,23 @@
 using namespace std;
 
 Monster::Monster(float size) {
-	this->size = size; velocity[0] = -5.0f; face = FACE::LEFT;status = STATUS::LIVE;
+	this->size = size; velocity[0] = -5.0f; face = FACE::LEFT; status = STATUS::LIVE; onPlatform = true;
 	velocity = { 0, 0, 0 };
 }
+
+float Monster::getMonsterSize() {
+	return size;
+}
+void Monster::setMonsterOnPlatform() {
+	onPlatform = true;
+}
+void Monster::setMonsterNotOnPlatform() {
+	onPlatform = false;
+}
+bool Monster::getMonsterOnPlatform() {
+	return onPlatform;
+}
+
 void Monster::setMonsterId(int i) {
 	monsterId = i;
 }
@@ -15,11 +29,24 @@ int Monster::getMonsterId() {
 	return monsterId;
 }
 
+void Monster::setMonsterFaceDown() {
+	face = FACE::DOWN;
+}
+void Monster::setMonsterFaceLeft() {
+	face = FACE::LEFT;
+}
+Monster::FACE Monster::getMonsterFace() {
+	return face;
+}
+
 void Monster::setMonsterlifeTrapped(){
 	status = STATUS::TRAP;
 }
 void Monster::setMonsterLifeDead() {
 	status = STATUS::DEAD;
+}
+void Monster::setMonsterLifeLive() {
+	status = STATUS::LIVE;
 }
 Monster::STATUS Monster::getMonsterStatus() {
 	return status;
@@ -67,20 +94,27 @@ vector<Vector3f> Monster::getvertex() {
 }
 
 void Monster::move() {
-	if (face == FACE::LEFT) {
-		velocity[0] = -5.0f;
+	if (onPlatform) {
+		if (face == FACE::LEFT) {
+			velocity[0] = -5.0f;
+			velocity[1] = 0.0f;
+		}
+		else if (face == FACE::RIGHT) {
+			velocity[0] = 5.0f;
+			velocity[1] = 0.0f;
+		}
+		if (face == FACE::LEFT && center[0] <= platform.getLeftEdge() + size / 2.0) {
+			setFace(FACE::RIGHT);
+		}
+		else if (face == FACE::RIGHT && center[0] >= platform.getRightEdge() - size / 2.0) {
+			setFace(FACE::LEFT);
+		}
 	}
-	else if (face == FACE::RIGHT) {
-		velocity[0] = 5.0f;
+	if (face == FACE::DOWN) {
+		velocity[0] = 0.0f;
+		velocity[1] = -1.0f;
 	}
 	center = center + velocity;
-
-	if (face == FACE::LEFT && center[0] <= platform.getLeftEdge() + size / 2.0) {
-		setFace(FACE::RIGHT);
-	}
-	else if (face == FACE::RIGHT && center[0] >= platform.getRightEdge() - size / 2.0) {
-		setFace(FACE::LEFT);
-	}
 
 }
 

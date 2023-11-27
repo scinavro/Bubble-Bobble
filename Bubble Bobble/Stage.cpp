@@ -39,6 +39,14 @@ void Stage::killMonster(int monsterid) {
 	}
 }
 
+Monster Stage::findMonster(int monsterid) {
+	for (auto& monster : Monsters) {
+		if (monster.getMonsterId() == monsterid) {
+			return monster;
+		}
+	}
+}
+
 void Stage::setstageFinished() {
 	isFinished = true;
 }

@@ -7,7 +7,7 @@ using namespace std;
 class Monster {
 	
 public:
-	enum class FACE { LEFT, RIGHT };
+	enum class FACE { LEFT, RIGHT, DOWN };
 	enum class STATUS { LIVE, TRAP, DEAD };
 	Monster(float size);
 	void setCenter(const Vector3f& c);
@@ -23,17 +23,29 @@ public:
 	void setFace(FACE f);
 	void draw() const;
 
+	void setMonsterFaceDown();
+	void setMonsterFaceLeft();
+
+	FACE getMonsterFace();
+
 	void setMonsterlifeTrapped();
 	STATUS getMonsterStatus();
 
 	void setMonsterLifeDead();
+	void setMonsterLifeLive();
+
+	void setMonsterOnPlatform();
+	void setMonsterNotOnPlatform();
+	bool getMonsterOnPlatform();
 
 	vector<Vector3f> getvertex();
 
 	void setMonsterId(int);
 	int getMonsterId();
+	float getMonsterSize();
 
 private:
+	bool onPlatform;
 	int monsterId;
 	Platform platform;
 	Vector3f center;

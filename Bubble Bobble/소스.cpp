@@ -27,7 +27,9 @@ clock_t start_t = clock();
 clock_t end_t;
 
 Player* player;
+Player* player_2;
 vector<Bubble> bubbles;
+vector<Bubble> bubbles_2;
 vector<vector<Bubble>> smallbubbles;
 vector<Stage> stages;
 Texture endImage;
@@ -36,10 +38,13 @@ int currentStage = 0;
 
 void initialize() {
 	player = new Player(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
+	player_2 = new Player(200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
 	startImage.initializeTexture("GameStart.png");
 	endImage.initializeTexture("GameOver.png");
 	player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 	player->setVerticalState(Player::VERTICAL_STATE::STOP);
+	player_2->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
+	player_2->setVerticalState(Player::VERTICAL_STATE::STOP);
 
 	Stage stage1(0);
 
@@ -331,11 +336,21 @@ bool checkBubble(int i) {
 	return bubbleExist;
 }
 
+bool checkBubble_2(int i) {
+	bool bubbleExist = false;
+	for (auto bubble : bubbles_2) {
+		if (bubble.getMonsterId() == i) {
+			bubbleExist = true;
+		}
+	}
+	return bubbleExist;
+}
+
 void idle() {
 	/* Implement */
 	end_t = clock();
 	if (currentStage < stages.size()) {
-		if (player->getPlayerLife() == 0) {
+		if (player->getPlayerLife() == 0 || player_2->getPlayerLife()==0) {
 			exit;
 		}
 		else {
@@ -344,6 +359,8 @@ void idle() {
 
 				player->horizontalmove();
 				player->verticalmove();
+				player_2->horizontalmove();
+				player_2->verticalmove();
 				Vector3f monsterCenter;
 				for (int i = 0; i < bubbles.size();) {
 					bubbles[i].move();
@@ -363,7 +380,7 @@ void idle() {
 						}
 						else {
 							float BubbleSizeVelocity = 2.0f;
-							if (BubbleCollidedWall(bubbles[i], stages[0])) {
+							if (BubbleCollidedWall(bubbles[i], stages[currentStage])) {
 								Vector3f v(0.0f, 0.0f, 0.0f);
 								bubbles[i].setVelocity(v);
 								BubbleSizeVelocity = 7.0f;
@@ -372,6 +389,37 @@ void idle() {
 								BubbleSizeVelocity = 2.0f;
 							}
 							bubbles[i].setRadius(bubbles[i].getRadius() + BubbleSizeVelocity);
+						}
+					}
+					i++;
+				}
+				for (int i = 0; i < bubbles_2.size();) {
+					bubbles_2[i].move();
+					if (bubbles_2[i].getStatus() == Bubble::STATUS::TRAPPING) {
+						if (bubbles_2[i].getVelocity()[1] <= 0) {
+							monsterCenter.setPos(bubbles_2[i].getCenter()[0], bubbles_2[i].getCenter()[1], bubbles_2[i].getCenter()[2]);
+							BubblePopEffect(bubbles_2[i]);
+							bubbles_2.erase(bubbles_2.begin() + i);
+							break;
+						}
+					}
+					else {
+						if (bubbles_2[i].getRadius() >= 30) {
+							bubbles_2[i].setRadius(30);
+							Vector3f v(0.0f, 3.0f, 0.0f);
+							bubbles_2[i].setVelocity(v);
+						}
+						else {
+							float BubbleSizeVelocity = 2.0f;
+							if (BubbleCollidedWall(bubbles_2[i], stages[currentStage])) {
+								Vector3f v(0.0f, 0.0f, 0.0f);
+								bubbles_2[i].setVelocity(v);
+								BubbleSizeVelocity = 7.0f;
+							}
+							else {
+								BubbleSizeVelocity = 2.0f;
+							}
+							bubbles_2[i].setRadius(bubbles_2[i].getRadius() + BubbleSizeVelocity);
 						}
 					}
 					i++;
@@ -388,7 +436,6 @@ void idle() {
 					if (monster.getMonsterStatus() == Monster::STATUS::LIVE) {
 						monster.move();
 						if (!monster.getMonsterOnPlatform()) {
-							cout << monster.getCenter()[1] << endl;
 							if (monster.getCenter()[1] <= monster.getPlatform().getTopEdge() + monster.getMonsterSize()/2.0) {
 								Vector3f newCenter(monster.getCenter()[0], monster.getPlatform().getTopEdge()+monster.getMonsterSize()/2.0, 0);
 								monster.setCenter(newCenter);
@@ -401,19 +448,26 @@ void idle() {
 						stages[currentStage].eraseMonster(monster.getMonsterId());
 					}
 					else if (monster.getMonsterStatus() == Monster::STATUS::TRAP) {
-						if (!checkBubble(monster.getMonsterId())) {
+						if (!checkBubble(monster.getMonsterId())&& !checkBubble_2(monster.getMonsterId())) {
 							monster.setMonsterLifeLive();
 							monster.setCenter(monsterCenter);
 							monster.setMonsterFaceDown();
 							monster.setMonsterNotOnPlatform();
 						}
 					}
+					
 				}
 
 				MonsterDeathHanler(stages[currentStage], bubbles);
+				MonsterDeathHanler(stages[currentStage], bubbles_2);
+
 				PlayerBubblePop(player, bubbles);
 				PlayerDeathHanler(stages[currentStage], player);
 				collisionHandler(stages[currentStage], player);
+
+				PlayerBubblePop(player_2, bubbles_2);
+				PlayerDeathHanler(stages[currentStage], player_2);
+				collisionHandler(stages[currentStage], player_2);
 
 
 			}
@@ -448,6 +502,8 @@ void display() {
 		endImage.setcenter(center);
 		endImage.setSize(200);
 		endImage.texture();
+		delete player;
+		delete player_2;
 		
 	}
 
@@ -468,16 +524,38 @@ void display() {
 			glColor3f(1.0f, 0.0f, 0.0f);
 			displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER LIFE : 3", -330.0f, 380.0f);
 		}
+
+		if (player_2->getPlayerLife() == 0) {
+			glColor3f(1.0f, 1.0f, 1.0f);
+			displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER 2 DEAD ------ GAME END", -100.0f, 100.0f);
+		}
+		else if (player_2->getPlayerLife() == 1) {
+			glColor3f(1.0f, 0.0f, 0.0f);
+			displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER 2 LIFE : 1", 200.0f, 380.0f);
+		}
+		else if (player_2->getPlayerLife() == 2) {
+			glColor3f(1.0f, 0.0f, 0.0f);
+			displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER 2 LIFE : 2", 200.0f, 380.0f);
+		}
+		else if (player_2->getPlayerLife() == 3) {
+			glColor3f(1.0f, 0.0f, 0.0f);
+			displayCharacters(GLUT_BITMAP_8_BY_13, "PLAYER 2 LIFE : 3", 200.0f, 380.0f);
+		}
+
 		if (currentStage < stages.size()) {
 			if (stages[currentStage].monstersControl().size() == 0) {
 				currentStage += 1;
 				Vector3f center(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f);
 				player->setCenter(center);
+				Vector3f center_2(200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f);
+				player_2->setCenter(center_2);
 			}
 		}
 
+
 		// Draw 2D
 		player->draw();
+		player_2->draw();
 		
 		// Draw 3D
 		glEnable(GL_DEPTH_TEST);
@@ -493,6 +571,9 @@ void display() {
 		/* Implement: Draw bubbles */
 
 		for (auto& bub : bubbles) {
+			bub.draw();
+		}
+		for (auto& bub : bubbles_2) {
 			bub.draw();
 		}
 
@@ -519,6 +600,9 @@ void keyboardDown(unsigned char key, int x, int y) {
 	/* Implement */
 	if (key == ' ') {
 		bubbles.push_back(player->shootBubble());
+	}
+	if (key == '2') {
+		bubbles_2.push_back(player_2->shootBubble());
 	}
 	if (key == '1') {
 		exit(0);
@@ -549,7 +633,26 @@ void specialKeyDown(int key, int x, int y) {
 				player->setVerticalState(Player::VERTICAL_STATE::JUMP);
 			}
 			break;
+		case GLUT_KEY_F1:
+			player_2->setFace(Player::FACE::LEFT);
+			if (!blockedByWall)
+				player_2->setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
+			break;
 
+		case GLUT_KEY_F2:
+			player_2->setFace(Player::FACE::RIGHT);
+			if (!blockedByWall)
+				player_2->setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
+			break;
+
+		case GLUT_KEY_F3:
+			if (player_2->getVerticalVelocity()[1] < 1 && player_2->getVerticalVelocity()[1] > -1) {
+				Vector3f newVelocity = player_2->getVerticalVelocity();
+				newVelocity[1] = 30.0f;
+				player_2->setVerticalVelocity(newVelocity);
+				player_2->setVerticalState(Player::VERTICAL_STATE::JUMP);
+			}
+			break;
 
 		default:
 			break;
@@ -566,6 +669,13 @@ void specialKeyUp(int key, int x, int y) {
 
 	case GLUT_KEY_RIGHT:
 		player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
+		break;
+	case GLUT_KEY_F1:
+		player_2->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
+		break;
+
+	case GLUT_KEY_F2:
+		player_2->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 		break;
 
 	default:

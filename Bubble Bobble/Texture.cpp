@@ -54,8 +54,14 @@ void Texture::texture() {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glColor4f(1.0, 1.0, 1.0, 1.0); // reset gl color
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
 	glBegin(GL_QUADS);
-	if (size != 0) { // 정사각형
+	if (size > 0.1) { // 정사각형
 		glTexCoord2f(0.0f, 0.0f); glVertex2f(center[0] - size / 2, center[1] - size / 2);
 		glTexCoord2f(0.0f, 1.0f); glVertex2f(center[0] - size / 2, center[1] + size / 2);
 		glTexCoord2f(1.0f, 1.0f); glVertex2f(center[0] + size / 2, center[1] + size / 2);
@@ -63,9 +69,9 @@ void Texture::texture() {
 	}
 	else { // 직사각형
 		glTexCoord2f(0.0f, 0.0f); glVertex2f(center[0] - width / 2, center[1] - height / 2);
-		glTexCoord2f(0.0f, 1.0f); glVertex2f(center[0] - width / 2, center[1] + height / 2);
-		glTexCoord2f(1.0f, 1.0f); glVertex2f(center[0] + width / 2, center[1] + height / 2);
-		glTexCoord2f(1.0f, 0.0f); glVertex2f(center[0] + width / 2, center[1] - height / 2);
+		glTexCoord2f(0.0f, height / imageheight); glVertex2f(center[0] - width / 2, center[1] + height / 2);
+		glTexCoord2f(width / imagewidth, height / imageheight); glVertex2f(center[0] + width / 2, center[1] + height / 2);
+		glTexCoord2f(width / imagewidth, 0.0f); glVertex2f(center[0] + width / 2, center[1] - height / 2);
 	}
 	glEnd();
 	glDisable(GL_TEXTURE_2D);

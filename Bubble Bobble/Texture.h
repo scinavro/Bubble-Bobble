@@ -25,7 +25,7 @@ public:
 	GLubyte* textureData;
 
 
-	int imagewidth, imageheight;
+	float imagewidth, imageheight;
 	float size;
 	float width, height;
 private:

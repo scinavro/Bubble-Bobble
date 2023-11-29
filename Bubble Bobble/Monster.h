@@ -1,13 +1,14 @@
 #pragma once
 #include"Vector3f.h"
 #include "Platform.h"
-#include<vector>
+#include "Texture.h"
+#include <vector>
 using namespace std;
 
 class Monster {
 	
 public:
-	enum class FACE { LEFT, RIGHT, DOWN };
+	enum FACE { LEFT, RIGHT, DOWN };
 	enum class STATUS { LIVE, TRAP, DEAD };
 	Monster(float size);
 	void setCenter(const Vector3f& c);
@@ -21,7 +22,7 @@ public:
 
 	void move();
 	void setFace(FACE f);
-	void draw() const;
+	void draw();
 
 	void setMonsterFaceDown();
 	void setMonsterFaceLeft();
@@ -50,6 +51,7 @@ private:
 	Platform platform;
 	Vector3f center;
 	Vector3f velocity;
+	Texture texture;
 	float size;
 	FACE face;
 	STATUS status;

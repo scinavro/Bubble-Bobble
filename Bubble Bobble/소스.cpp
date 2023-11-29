@@ -34,13 +34,15 @@ vector<vector<Bubble>> smallbubbles;
 vector<Stage> stages;
 Texture endImage;
 Texture startImage;
-int currentStage = 0;
+Texture backgroundImage;
+int currentStage = -1;
 
 void initialize() {
 	player = new Player(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
 	player_2 = new Player(200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
 	startImage.initializeTexture("GameStart.png");
 	endImage.initializeTexture("GameOver.png");
+	backgroundImage.initializeTexture("Background.png");
 	player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 	player->setVerticalState(Player::VERTICAL_STATE::STOP);
 	player_2->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
@@ -492,15 +494,21 @@ void display() {
 	if (currentStage == -1) {
 		Vector3f center(0, 0, 0);
 		startImage.setcenter(center);
-		startImage.setSize(400);
+		startImage.setSize(800);
 		startImage.texture();
-		currentStage += 1;
+	}
+
+	if (currentStage > -1 && currentStage < 2) {
+		Vector3f center(0, 0, 0);
+		backgroundImage.setcenter(center);
+		backgroundImage.setSize(800);
+		backgroundImage.texture();
 	}
 
 	if (currentStage == 2) {
 		Vector3f center(0, 0, 0);
 		endImage.setcenter(center);
-		endImage.setSize(200);
+		endImage.setSize(400);
 		endImage.texture();
 		delete player;
 		delete player_2;
@@ -599,7 +607,10 @@ void display() {
 void keyboardDown(unsigned char key, int x, int y) {
 	/* Implement */
 	if (key == ' ') {
-		bubbles.push_back(player->shootBubble());
+		if (currentStage == -1)
+			currentStage++;
+		else
+			bubbles.push_back(player->shootBubble());
 	}
 	if (key == '2') {
 		bubbles_2.push_back(player_2->shootBubble());

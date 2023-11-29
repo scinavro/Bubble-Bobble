@@ -7,6 +7,7 @@ using namespace std;
 Monster::Monster(float size) {
 	this->size = size; velocity[0] = -5.0f; face = FACE::LEFT; status = STATUS::LIVE; onPlatform = true;
 	velocity = { 0, 0, 0 };
+	texture.initializeTexture("monster.png");
 }
 
 float Monster::getMonsterSize() {
@@ -118,14 +119,8 @@ void Monster::move() {
 
 }
 
-void Monster::draw() const {
-	if (status == Monster::STATUS::LIVE) {
-		glColor3f(1.0f, 1.0f, 0.0f);
-		glBegin(GL_POLYGON);
-		glVertex3f(center[0] + size / 2, center[1] + size / 2, center[2]);
-		glVertex3f(center[0] - size / 2, center[1] + size / 2, center[2]);
-		glVertex3f(center[0] - size / 2, center[1] - size / 2, center[2]);
-		glVertex3f(center[0] + size / 2, center[1] - size / 2, center[2]);
-		glEnd();
-	}
+void Monster::draw(){
+	texture.setcenter(center);
+	texture.setSize(size);
+	texture.texturePlayer(face);
 }

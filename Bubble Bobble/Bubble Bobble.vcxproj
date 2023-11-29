@@ -161,6 +161,15 @@
     <ClInclude Include="Vector4f.h" />
     <ClInclude Include="Wall.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Background.png" />
+    <Image Include="bubble.png" />
+    <Image Include="GameOver.png" />
+    <Image Include="GameStart.png" />
+    <Image Include="monster.png" />
+    <Image Include="snu.png" />
+    <Image Include="wall.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

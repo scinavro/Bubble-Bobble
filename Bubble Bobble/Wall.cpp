@@ -4,6 +4,8 @@
 Wall::Wall(float x, float y, float z, float w, float h) {
 	center[0] = x; center[1] = y; center[2] = z; width = w; height = h;
 	texture.initializeTexture("wall.png");
+	texture.setcenter(center);
+	texture.setWidthHeight(width, height);
 }
 
 float Wall::getTopEdge() const {
@@ -23,15 +25,13 @@ float Wall::getRightEdge() const {
 }
 
 void Wall::draw() {
-	glColor3f(0.3f, 0.4f, 0.3f);
+	/*glColor3f(0.3f, 0.4f, 0.3f);
 	glBegin(GL_QUADS);
 	glVertex3f(center[0] - width / 2, center[1] - height / 2, center[2]);
 	glVertex3f(center[0] + width / 2, center[1] - height / 2, center[2]);
 	glVertex3f(center[0] + width / 2, center[1] + height / 2, center[2]);
 	glVertex3f(center[0] - width / 2, center[1] + height / 2, center[2]);
-	glEnd();
-
-	/*texture.setcenter(center);
-	texture.setWidthHeight(width, height);
-	texture.texture();*/
+	glEnd();*/
+	
+	texture.texture();
 }

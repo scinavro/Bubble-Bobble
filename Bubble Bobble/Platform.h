@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vector3f.h"
+#include "Texture.h"
 
 class Platform
 {
@@ -13,11 +14,11 @@ public:
 	float getLeftEdge() const;
 	float getRightEdge() const;
 
-	void draw() const;
+	void draw();
 
 private:
 	Vector3f center;
-
+	Texture texture;
 	float width, height;
 };
 

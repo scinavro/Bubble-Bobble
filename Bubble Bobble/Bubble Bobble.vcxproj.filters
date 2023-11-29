@@ -90,4 +90,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="bubble.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="GameOver.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="GameStart.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="snu.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="wall.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Background.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="monster.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

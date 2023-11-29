@@ -35,7 +35,7 @@ public:
 	void setFace(FACE f);
 	void setHorizontalState(HORIZONTAL_STATE hState);
 	void setVerticalState(VERTICAL_STATE vState);
-	Bubble shootBubble();
+	Bubble shootBubble(int version);
 
 	void horizontalmove();
 	void verticalmove();

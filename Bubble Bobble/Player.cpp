@@ -80,7 +80,7 @@ void Player::setVerticalState(VERTICAL_STATE vState) {
 		verticalState = VERTICAL_STATE::STOP;
 	}
 }
-Bubble Player::shootBubble() {
+Bubble Player::shootBubble(int version) {
 	Bubble bub(2, 20, 20);
 	Vector3f BubbleVelocity;
 	BubbleVelocity.setPos(15.0f, 0.0f, 0.0f);
@@ -94,11 +94,20 @@ Bubble Player::shootBubble() {
 
 
 	Material mtl1;
-	mtl1.setEmission(0.1f, 0.1f, 0.1f, 1.0f);
-	mtl1.setAmbient(0.4f, 0.4f, 0.1f, 1.0f);
-	mtl1.setDiffuse(0.7f, 0.7f, 0.7f, 1.0f);
-	mtl1.setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-	mtl1.setShininess(10.0f);
+	if (version == 1) {
+		mtl1.setEmission(0.0f, 0.5f, 0.0f, 0.5f);
+		mtl1.setAmbient(0.0f, 0.5f, 0.0f, 0.5f);
+		mtl1.setDiffuse(0.0f, 0.5f, 0.0f, 0.5f);
+		mtl1.setSpecular(0.0f, 0.5f, 0.0f, 0.5f);
+		mtl1.setShininess(1.0f);
+	}
+	else if (version == 2) {
+		mtl1.setEmission(0.0f, 0.0f, 0.5f, 0.5f);
+		mtl1.setAmbient(0.0f, 0.0f, 0.5f, 0.5f);
+		mtl1.setDiffuse(0.0f, 0.0f, 0.5f, 0.5f);
+		mtl1.setSpecular(0.0f, 0.0f, 0.5f, 0.5f);
+		mtl1.setShininess(1.0f);
+	}
 
 	bub.setMTL(mtl1);
 

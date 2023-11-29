@@ -34,13 +34,15 @@ vector<vector<Bubble>> smallbubbles;
 vector<Stage> stages;
 Texture endImage;
 Texture startImage;
+Texture explainImage;
 Texture backgroundImage;
-int currentStage = -1;
+int currentStage = -2;
 
 void initialize() {
 	player = new Player(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE, "bubble.png");
 	player_2 = new Player(200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE, "bobble.png");
 	startImage.initializeTexture("GameStart.png");
+	explainImage.initializeTexture("Explain.png");
 	endImage.initializeTexture("GameOver_2.png");
 	backgroundImage.initializeTexture("Background.png");
 	player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
@@ -490,11 +492,18 @@ void display() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	if (currentStage == -1) {
+	if (currentStage == -2) {
 		Vector3f center(0, 0, 0);
 		startImage.setcenter(center);
 		startImage.setSize(800);
 		startImage.texture();
+	}
+
+	if (currentStage == -1) {
+		Vector3f center(0, 0, 0);
+		explainImage.setcenter(center);
+		explainImage.setSize(800);
+		explainImage.texture();
 	}
 
 	if (currentStage > -1 && currentStage < 2) {
@@ -614,18 +623,18 @@ void keyboardUp(unsigned char key, int x, int y) {
 
 void keyboardDown(unsigned char key, int x, int y) {
 	/* Implement */
-	if (currentStage == -1)
+	if (currentStage < 0)
 		currentStage++;
 
 	if (currentStage == stages.size())
 		exit(0);
 
 	if (key == 'm') {
-		bubbles_2.push_back(player_2->shootBubble());
+		bubbles_2.push_back(player_2->shootBubble(2));
 	}
 
 	if (key == 'v') {
-		bubbles.push_back(player->shootBubble());
+		bubbles.push_back(player->shootBubble(1));
 	}
 
 	if (key == '1') {

@@ -61,13 +61,33 @@ void Bubble::move() {
 	velocity = velocity + acceleration;
 	center = center + velocity;
 }
+#include <iostream>
 void Bubble::draw() const {
+	float getambient[4] = { mtl.getAmbient()[0], mtl.getAmbient()[1], mtl.getAmbient()[2], mtl.getAmbient()[3] };
+	float getdiffuse[4] = { mtl.getDiffuse()[0],mtl.getDiffuse()[1],mtl.getDiffuse()[2],mtl.getDiffuse()[3] };
+	float getspecular[4] = { mtl.getSpecular()[0],mtl.getSpecular()[1],mtl.getSpecular()[2],mtl.getSpecular()[3] };
+	float getemission[4] = { mtl.getEmission()[0] ,mtl.getEmission()[1] ,mtl.getEmission()[2] ,mtl.getEmission()[3] };
+	float shininess[1] = { mtl.getShininess() };
 	
-		float getambient[4] = { mtl.getAmbient()[0], mtl.getAmbient()[1], mtl.getAmbient()[2], mtl.getAmbient()[3] };
-		float getdiffuse[4] = { mtl.getDiffuse()[0],mtl.getDiffuse()[1],mtl.getDiffuse()[2],mtl.getDiffuse()[3] };
-		float getspecular[4] = { mtl.getSpecular()[0],mtl.getSpecular()[1],mtl.getSpecular()[2],mtl.getSpecular()[3] };
-		float getemission[4] = { mtl.getEmission()[0] ,mtl.getEmission()[1] ,mtl.getEmission()[2] ,mtl.getEmission()[3] };
-		float shininess[1] = { mtl.getShininess() };
+	if (status == STATUS::TRAPPING) {
+		getambient[0] = 0.5f;
+		getambient[1] = 0.0f;
+		getambient[2] = 0.0f;
+		getambient[3] = 0.5f;
+		getdiffuse[0] = 0.5f;
+		getdiffuse[1] = 0.0f;
+		getdiffuse[2] = 0.0f;
+		getdiffuse[3] = 0.5f;
+		getspecular[0] = 0.5f;
+		getspecular[1] = 0.0f;
+		getspecular[2] = 0.0f;
+		getspecular[3] = 0.5f;
+		getemission[0] = 0.5f;
+		getemission[1] = 0.0f;
+		getemission[2] = 0.0f;
+		getemission[3] = 0.5f;
+		shininess[0] = 1.0f;
+	}
 
 		glPushMatrix();
 		glTranslatef(center[0], center[1], center[2]);

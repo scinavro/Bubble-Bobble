@@ -5,7 +5,7 @@
 
 Bubble::Bubble(){}
 Bubble::Bubble(float r, int sl, int st) {
-	radius = r; slice = sl; stack = st; status = Bubble::STATUS::NORMAL;
+	radius = r; slice = sl; stack = st; status = Bubble::STATUS::NORMAL; acceleration = { 0, 0, 0 };
 }
 void Bubble::setMonsterId(int id) {
 	trappingMonsterId = id;

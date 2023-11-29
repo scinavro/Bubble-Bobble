@@ -41,7 +41,7 @@ void initialize() {
 	player = new Player(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE, "bubble.png");
 	player_2 = new Player(200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE, "bobble.png");
 	startImage.initializeTexture("GameStart.png");
-	endImage.initializeTexture("GameOver.png");
+	endImage.initializeTexture("GameOver_2.png");
 	backgroundImage.initializeTexture("Background.png");
 	player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 	player->setVerticalState(Player::VERTICAL_STATE::STOP);
@@ -92,14 +92,10 @@ void initialize() {
 	vector<Platform> platforms2;
 	Platform ground3(0.0f, -boundaryY + PLAYER_SIZE * 0.5f, 0.0f, boundaryX * 2, PLAYER_SIZE);
 	platforms2.push_back(ground3);
-	Platform p7(225, -75, 0, 250, 50);
-	Platform p8(-225, -75, 0, 250, 50);
+	Platform p7(275, -25, 0, 250, 50);
+	Platform p8(-275, -25, 0, 250, 50);
 	Platform p5(0, -180, 0, boundaryX, 50);
 	Platform p6(0, 160, 0, boundaryX, 50);
-	Platform p9(-boundaryX + PLAYER_SIZE * 0.5f, -75, 0, 50, 50);
-	Platform p10(+boundaryX - PLAYER_SIZE * 0.5f, -75, 0, 50, 50);
-	platforms2.push_back(Platform(p9));
-	platforms2.push_back(Platform(p10));
 	platforms2.push_back(Platform(p7));
 	platforms2.push_back(Platform(p8));
 	platforms2.push_back(Platform(p5));
@@ -107,10 +103,10 @@ void initialize() {
 	stage2.setPlatforms(platforms2);
 
 	vector<Wall> walls2;
-	walls2.push_back(Wall(-boundaryX + PLAYER_SIZE * 0.5f, -225.0f, 0.0f, PLAYER_SIZE, 250.0f));
-	walls2.push_back(Wall(-boundaryX + PLAYER_SIZE * 0.5f, 225.0f, 0.0f, PLAYER_SIZE, 350.0f));
-	walls2.push_back(Wall(+boundaryX - PLAYER_SIZE * 0.5f, -225.0f, 0.0f, PLAYER_SIZE, 250.0f));
-	walls2.push_back(Wall(+boundaryX - PLAYER_SIZE * 0.5f, 225.0f, 0.0f, PLAYER_SIZE, 350.0f));
+	walls2.push_back(Wall(-boundaryX + PLAYER_SIZE * 0.5f, -200.0f, 0.0f, PLAYER_SIZE, 300.0f));
+	walls2.push_back(Wall(-boundaryX + PLAYER_SIZE * 0.5f, 250.0f, 0.0f, PLAYER_SIZE, 300.0f));
+	walls2.push_back(Wall(+boundaryX - PLAYER_SIZE * 0.5f, -200.0f, 0.0f, PLAYER_SIZE, 300.0f));
+	walls2.push_back(Wall(+boundaryX - PLAYER_SIZE * 0.5f, 250.0f, 0.0f, PLAYER_SIZE, 300.0f));
 	stage2.setWalls(walls2);
 
 	vector<Monster> monsters2;
@@ -222,29 +218,29 @@ void MonsterDeathHanler(Stage& stage, vector<Bubble> &bubbles) {
 	for (auto& monster : stage.monstersControl()) {
 		for (auto& bubble : bubbles) {
 			if (bubble.getRadius() < 30) {
-				if (MonsterBubbleCollision(monster, bubble)) {
-					monster.setMonsterlifeTrapped();
-					bubble.setBubbleTrapping();
-					bubble.setRadius(30);
-					bubble.setVelocity(Vector3f(0, 3.3, 0));
-					bubble.setAcceleration(Vector3f(0, -0.05, 0));
-					bubble.setMonsterId(monster.getMonsterId());
-					break;
+				if (monster.getMonsterStatus() == Monster::STATUS::LIVE) {
+					if (MonsterBubbleCollision(monster, bubble)) {
+						monster.setMonsterlifeTrapped();
+						bubble.setBubbleTrapping();
+						bubble.setRadius(30);
+						bubble.setVelocity(Vector3f(0, 3.3, 0));
+						bubble.setAcceleration(Vector3f(0, -0.05, 0));
+						bubble.setMonsterId(monster.getMonsterId());
+						break;
+					}
 				}
 			}
 		}
 	}
 }
 
-bool PlayerBubbleCollision(vector<Vector3f>vertexes, Bubble bubble) {
+bool PlayerBubbleCollision(Player player, Bubble bubble) {
 	bool playerBubbleCollided = false;
+
 	if (bubble.getRadius() == 30) {
-		for (auto& vertex : vertexes) {
-			float distance = sqrt(pow(bubble.getCenter()[0] - vertex[0], 2) + pow(bubble.getCenter()[1] - vertex[1], 2));
-			if (distance <= bubble.getRadius()) {
-				playerBubbleCollided = true;
-				break;
-			}
+		float distance = sqrt(pow(bubble.getCenter()[0] - player.getCenter()[0], 2) + pow(bubble.getCenter()[1] - player.getCenter()[1], 2));
+		if (distance <= PLAYER_SIZE / 2 + bubble.getRadius()) {
+			playerBubbleCollided = true;
 		}
 	}
 	return playerBubbleCollided;
@@ -263,7 +259,7 @@ void BubblePopEffect(Bubble bubble) {
 void PlayerBubblePop(Player *player, vector<Bubble>& bubbles) {
 	for (int i = 0; i < bubbles.size();) {
 
-		if (PlayerBubbleCollision(player->getvertex(), bubbles[i])) {
+		if (PlayerBubbleCollision(*player, bubbles[i])) {
 			if (bubbles[i].getStatus() == Bubble::STATUS::TRAPPING) {
 				// MONSTER SET DEAD
 				stages[currentStage].killMonster(bubbles[i].getMonsterId());
@@ -513,8 +509,7 @@ void display() {
 		endImage.setcenter(center);
 		endImage.setSize(400);
 		endImage.texture();
-		delete player;
-		delete player_2;
+
 		
 	}
 
@@ -607,19 +602,55 @@ void display() {
 	glutSwapBuffers();
 }
 
+void keyboardUp(unsigned char key, int x, int y) {
+	if (key == 'a') {
+		player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
+	}
+
+	if (key == 'd') {
+		player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
+	}
+}
+
 void keyboardDown(unsigned char key, int x, int y) {
 	/* Implement */
-	if (key == ' ') {
-		if (currentStage == -1)
-			currentStage++;
-		else
-			bubbles.push_back(player->shootBubble());
-	}
-	if (key == '2') {
+	if (currentStage == -1)
+		currentStage++;
+
+	if (currentStage == stages.size())
+		exit(0);
+
+	if (key == 'm') {
 		bubbles_2.push_back(player_2->shootBubble());
 	}
+
+	if (key == 'v') {
+		bubbles.push_back(player->shootBubble());
+	}
+
 	if (key == '1') {
 		exit(0);
+	}
+
+	if (key == 'a') {
+		player->setFace(Player::FACE::LEFT);
+		if (!blockedByWall)
+			player->setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
+	}
+
+	if (key == 'd') {
+		player->setFace(Player::FACE::RIGHT);
+		if (!blockedByWall)
+			player->setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
+	}
+
+	if (key == 'w') {
+		if (player->getVerticalVelocity()[1] < 1 && player->getVerticalVelocity()[1] > -1) {
+			Vector3f newVelocity = player->getVerticalVelocity();
+			newVelocity[1] = 30.0f;
+			player->setVerticalVelocity(newVelocity);
+			player->setVerticalState(Player::VERTICAL_STATE::JUMP);
+		}
 	}
 
 }
@@ -628,38 +659,18 @@ void specialKeyDown(int key, int x, int y) {
 	/* Implement */
 	switch (key) {
 		case GLUT_KEY_LEFT:
-			player->setFace(Player::FACE::LEFT);
-			if (!blockedByWall)
-				player->setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
-			break;
-
-		case GLUT_KEY_RIGHT:
-			player->setFace(Player::FACE::RIGHT);
-			if (!blockedByWall)
-				player->setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
-			break;
-
-		case GLUT_KEY_UP:
-			if (player->getVerticalVelocity()[1] < 1 && player->getVerticalVelocity()[1] > -1) {
-				Vector3f newVelocity = player->getVerticalVelocity();
-				newVelocity[1] = 30.0f;
-				player->setVerticalVelocity(newVelocity);
-				player->setVerticalState(Player::VERTICAL_STATE::JUMP);
-			}
-			break;
-		case GLUT_KEY_F1:
 			player_2->setFace(Player::FACE::LEFT);
 			if (!blockedByWall)
 				player_2->setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
 			break;
 
-		case GLUT_KEY_F2:
+		case GLUT_KEY_RIGHT:
 			player_2->setFace(Player::FACE::RIGHT);
 			if (!blockedByWall)
 				player_2->setHorizontalState(Player::HORIZONTAL_STATE::MOVE);
 			break;
 
-		case GLUT_KEY_F3:
+		case GLUT_KEY_UP:
 			if (player_2->getVerticalVelocity()[1] < 1 && player_2->getVerticalVelocity()[1] > -1) {
 				Vector3f newVelocity = player_2->getVerticalVelocity();
 				newVelocity[1] = 30.0f;
@@ -667,6 +678,7 @@ void specialKeyDown(int key, int x, int y) {
 				player_2->setVerticalState(Player::VERTICAL_STATE::JUMP);
 			}
 			break;
+		
 
 		default:
 			break;
@@ -678,19 +690,13 @@ void specialKeyUp(int key, int x, int y) {
 
 	switch (key) {
 	case GLUT_KEY_LEFT:
-		player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
+		player_2->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 		break;
 
 	case GLUT_KEY_RIGHT:
-		player->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
-		break;
-	case GLUT_KEY_F1:
 		player_2->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
 		break;
-
-	case GLUT_KEY_F2:
-		player_2->setHorizontalState(Player::HORIZONTAL_STATE::STOP);
-		break;
+	
 
 	default:
 		break;
@@ -713,11 +719,15 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(display);
 	glutIdleFunc(idle);
 	glutKeyboardFunc(keyboardDown);
+	glutKeyboardUpFunc(keyboardUp);
 	glutSpecialFunc(specialKeyDown);
 	glutSpecialUpFunc(specialKeyUp);
 
 	// enter GLUT event processing cycle
 	glutMainLoop();
+
+	delete player;
+	delete player_2;
 
 	return 0;
 }

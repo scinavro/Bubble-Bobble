@@ -120,7 +120,9 @@ void Monster::move() {
 }
 
 void Monster::draw(){
-	texture.setcenter(center);
-	texture.setSize(size);
-	texture.texturePlayer(face);
+	if (status == STATUS::LIVE) {
+		texture.setcenter(center);
+		texture.setSize(size);
+		texture.texturePlayer(face);
+	}
 }

@@ -12,7 +12,7 @@ public:
 	enum class HORIZONTAL_STATE { STOP, MOVE };
 	enum class VERTICAL_STATE { STOP, JUMP, FALL };
 
-	Player(float x, float y, float z, float size);
+	Player(float x, float y, float z, float size, const char* name);
 
 	int getPlayerLife();
 

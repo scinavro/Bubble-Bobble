@@ -1,9 +1,9 @@
 #include "Player.h"
 #include<GL/freeglut.h>
 
-Player::Player(float x, float y, float z, float size){
+Player::Player(float x, float y, float z, float size, const char* name){
 	center[0] = x; center[1] = y; center[2] = z; this->size = size; face = FACE::LEFT; playerLife = 3;
-	texture.initializeTexture("bubble.png");
+	texture.initializeTexture(name);
 }
 
 Texture Player::getTexture() {

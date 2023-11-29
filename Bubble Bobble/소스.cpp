@@ -38,8 +38,8 @@ Texture backgroundImage;
 int currentStage = -1;
 
 void initialize() {
-	player = new Player(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
-	player_2 = new Player(200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE);
+	player = new Player(-200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE, "bubble.png");
+	player_2 = new Player(200.0f, -boundaryY + PLAYER_SIZE * 1.5f, 0.0f, PLAYER_SIZE, "bobble.png");
 	startImage.initializeTexture("GameStart.png");
 	endImage.initializeTexture("GameOver.png");
 	backgroundImage.initializeTexture("Background.png");
@@ -490,6 +490,9 @@ void display() {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	if (currentStage == -1) {
 		Vector3f center(0, 0, 0);
